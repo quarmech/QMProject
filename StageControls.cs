@@ -10,14 +10,15 @@ namespace QMProjectT
     {
         public BasicConnection _conn;
         public bool JoyStick = false;
+        public bool Moving = false;
         
         public StageControls(BasicConnection comm)
         {
             _conn = comm;
             _conn.OpenConnection();
             this.Setup();
-            this.XHome();
-            this.YHome();         
+            this.HomeX();
+            this.HomeY();         
         }
         public void Setup()
         {
@@ -47,9 +48,11 @@ namespace QMProjectT
             _conn.WriteRead("2 i r0 32771");
             this.JoyStick = false;
         }
-        public void XHome()
+        public void HomeX()
         {
             _conn.WriteRead("0 t 2");
+
+            Moving = true;
 
             while (true)
             {
@@ -68,10 +71,9 @@ namespace QMProjectT
                     Console.WriteLine("done moving");
                     break;
                 }
-
             }
         }
-        public void YHome()
+        public void HomeY()
         {
             _conn.WriteRead("1 t 2");
 
@@ -92,41 +94,32 @@ namespace QMProjectT
                     Console.WriteLine("done moving");
                     break;
                 }
-
             }
         }
-        public void MoveX(string code)
+        public void MoveX(int n)
         {
             if (this.JoyStick)
             {
                 this.JoystickOff();
             }
-            try
-            {
-                var pos = code.Split()[1];
-                _conn.WriteRead($"0 s r0xca {pos}");
-            }
-            catch (IndexOutOfRangeException)
-            {                
-            }
+            _conn.WriteRead($"0 s r0xca {n}");
+            
+            
             _conn.WriteRead("0 t 1");
         }
-        public void MoveY(string code)
+        public void MoveY(int n)
         {
             if (this.JoyStick)
             {
                 this.JoystickOff();
             }
-            try
-            {
-                var pos = code.Split()[1];
-                _conn.WriteRead($"1 s r0xca {pos}");
-            }
-            catch (IndexOutOfRangeException)
-            {
-            }
+
+            _conn.WriteRead($"1 s r0xca {n}");
+
+
             _conn.WriteRead("1 t 1");
-        }     
+        }
+        
         public void Reset()
         {
             _conn.Send($"0 r");
@@ -134,8 +127,19 @@ namespace QMProjectT
             _conn.Send($"2 r");
             _conn.Send($"3 r");
         }
-
-        public void MoveRelative(string code)
+        public void MoveRelative(string axis, int pos)
+        {
+            string saxis = axis.ToString();
+            string spos = pos.ToString();
+            if (this.JoyStick)
+            {
+                this.JoystickOff();
+            }
+            _conn.WriteRead($"{Axis(saxis)} s r0xc8 256");
+            _conn.WriteRead($"{Axis(saxis)} s r0xca {spos}");
+            _conn.WriteRead($"{Axis(saxis)} t 1");
+        }
+        public void MoveRelative(string options)
         {
             //format => moveabsolute x 90000
 
@@ -149,12 +153,12 @@ namespace QMProjectT
 
             try
             {
-                axis = code.Split()[1];
+                axis = options.Split()[0];
                 //set to absolute move mode
                 _conn.WriteRead($"{Axis(axis)} s r0xc8 256");
                 try
                 {
-                    n = code.Split()[2];
+                    n = options.Split()[1];
                     //set
                     _conn.WriteRead($"{Axis(axis)} s r0xca {n}");
                     Console.WriteLine($"moving by distance: {n}");
@@ -172,37 +176,31 @@ namespace QMProjectT
             }
 
         }
-        public void MoveAbsolute(char axis, int pos)
+        public void MoveAbsolute(string axis, int pos)
         {
-            string axiss = axis.ToString();
-            string poss = pos.ToString();
+            string saxis = axis.ToString();
+            string spos = pos.ToString();
             if (this.JoyStick)
             {
                 this.JoystickOff();
             }
-            _conn.WriteRead($"{Axis(axiss)} s r0xc8 0");
-            _conn.WriteRead($"{Axis(axiss)} s r0xca {poss}");
-            _conn.WriteRead($"{Axis(axiss)} t 1");
+            _conn.WriteRead($"{Axis(saxis)} s r0xc8 0");
+            _conn.WriteRead($"{Axis(saxis)} s r0xca {spos}");
+            _conn.WriteRead($"{Axis(saxis)} t 1");
         }
-        public void MoveAbsolute(string code)
+        public void MoveAbsolute(string options)
         {
-            //format => moveabsolute x 90000
+            //format => moveabsolute axis 90000
             string axis;
-            string n;
-
-            if (this.JoyStick)
-            {
-                this.JoystickOff();
-            }
-
+            string n;    
             try
             {
-                axis = code.Split()[1];
+                axis = options.Split()[0];
                 //set to absolute move mode
                 _conn.WriteRead($"{Axis(axis)} s r0xc8 0");
                 try
                 {
-                    n = code.Split()[2];
+                    n = options.Split()[1];
                     //set
                     _conn.WriteRead($"{Axis(axis)} s r0xca {n}");
                     Console.WriteLine($"moving to position {n}");
@@ -222,139 +220,74 @@ namespace QMProjectT
         }
 
 
-        public void SetAbsolute(string code)
-        {
-            string axis;           
-            try
-            {
-                axis = code.Split()[1];                                      
-                _conn.WriteRead($"{Axis(axis)} s r0xc8 0");
-            }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("no axis given");
-            }
+        public void SetAbsolute(string axis)
+        {                                   
+            _conn.WriteRead($"{Axis(axis)} s r0xc8 0");  
         }
-        public void SetRelative(string code)
+        public void SetRelative(string axis)
         {
-            string axis;
-            try
-            {
-                axis = code.Split()[1];
-                _conn.WriteRead($"{Axis(axis)} s r0xc8 256");
-            }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("no axis given");
-            }
-        }
+            _conn.WriteRead($"{Axis(axis)} s r0xc8 256");
+        }       
 
-        public void Position(string code)
+        public void Position(string axis, int? pos)
         {
-            string axis;
-            string n;
-            try
+            if (pos is null)
             {
-                axis = code.Split()[1];
-                try
-                {
-                    n = code.Split()[2];
-                    //set
-                    _conn.WriteRead($"{Axis(axis)} s r0x32 {n}");
-                }
-                catch (IndexOutOfRangeException)
-                {
-
-                }
-                // get            
+                //get
                 _conn.WriteRead($"{Axis(axis)} g r0x32");
-
             }
-            catch (IndexOutOfRangeException)
+            else
             {
-                Console.WriteLine("no axis given");
-            }
+                //set
+                _conn.WriteRead($"{Axis(axis)} s r0x32 {pos}");
+            }                          
         }
-    
 
-        public void Velocity(string code)
+        public void Velocity(string axis, int? pos)
         {
-            string axis;
-            string n;
-            try
+            if (pos is null)
             {
-                axis = code.Split()[1];
-                try
-                {
-                    n = code.Split()[2];
-                    //set
-                    _conn.WriteRead($"{Axis(axis)} s r0xcb {n}");
-                }
-                catch (IndexOutOfRangeException)
-                {
-
-                }
-                // get
+                //get
                 _conn.WriteRead($"{Axis(axis)} g r0xcb");
-                
             }
-            catch (IndexOutOfRangeException)
+            else
             {
-                Console.WriteLine("no axis given");
+                //set
+                _conn.WriteRead($"{Axis(axis)} s r0xcb {pos}");
             }
         }
-        public void Acceleration(string code)
-        {
-            string axis;
-            string n;
-            try
-            {
-                axis = code.Split()[1];
-                try
-                {
-                    n = code.Split()[2];
-                    //set
-                    _conn.WriteRead($"{Axis(axis)} s r0xcc {n}");
-                }
-                catch (IndexOutOfRangeException)
-                {
 
-                }
-                // get            
+        public void Acceleration(string axis, int? pos)
+        {
+            if (pos is null)
+            {
+                //get
                 _conn.WriteRead($"{Axis(axis)} g r0xcc");
-
             }
-            catch (IndexOutOfRangeException)
+            else
             {
-                Console.WriteLine("no axis given");
+                //set
+                _conn.WriteRead($"{Axis(axis)} s r0xcc {pos}");
             }
         }
-        public void Deceleration(string code)
+
+        public void Deceleration(string axis, int? pos)
         {
-            string axis;
-            string n;
-            try
+            if (pos is null)
             {
-                axis = code.Split()[1];
-                try
-                {
-                    n = code.Split()[2];
-                    //set
-                    _conn.WriteRead($"{Axis(axis)} s r0xcd {n}");
-                }
-                catch (IndexOutOfRangeException)
-                {
-
-                }
-                // get            
+                //get
                 _conn.WriteRead($"{Axis(axis)} g r0xcd");
-
             }
-            catch (IndexOutOfRangeException)
+            else
             {
-                Console.WriteLine("no axis given");
+                //set
+                _conn.WriteRead($"{Axis(axis)} s r0xcd {pos}");
             }
         }
+
+        
+   
+        
         public string Axis(string a)
         {
             switch (a)

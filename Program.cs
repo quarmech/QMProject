@@ -22,60 +22,62 @@ namespace QMProjectT
             while (true)
             {
                 Console.Write($"Command:");
-                string code = Console.ReadLine();
-          
+                string input = Console.ReadLine();
+                var splitInput = input.Split();
+                var code = splitInput[0];                              
+                
                 if (stringComparer.Equals("quit", code))
                 {
-                    stageConnection.Close();
+                    stageConnection.End();
                     break;
                 }
-                else if (stringComparer.Equals("xhome", code))
+                else if (stringComparer.Equals("homex", code))
                 {
-                    stageControls.XHome();
+                    stageControls.HomeX();
                 }
-                else if (stringComparer.Equals("yhome", code))
+                else if (stringComparer.Equals("homey", code))
                 {
-                    stageControls.YHome();
+                    stageControls.HomeY();
                 }
                 else if (stringComparer.Equals("movex", code))
-                {                 
-                    stageControls.MoveX(code);
+                {
+                    MoveX(splitInput);
                 }
                 else if (stringComparer.Equals("movey", code))
                 {
-                    stageControls.MoveY(code);
+                    MoveY(splitInput);
                 }
-                else if (stringComparer.Equals("moveAbsolute", code.Split()[0]))
-                {                   
-                    stageControls.MoveAbsolute(code);                  
-                }
-                else if (stringComparer.Equals("moveRelative", code.Split()[0]))
+                else if (stringComparer.Equals("moveAbs", code))
                 {
-                    stageControls.MoveRelative(code);
+                    MoveAbsolute(splitInput);                             
+                }
+                else if (stringComparer.Equals("moveRel", code))
+                {
+                    MoveRelative(splitInput);
                 }                             
-                else if (stringComparer.Equals("setAbsolute", code.Split()[0]))
+                else if (stringComparer.Equals("setAbs", code))
                 {
-                    stageControls.SetAbsolute(code);
+                    SetAbsolute(splitInput);
                 }
-                else if (stringComparer.Equals("setRelative", code.Split()[0]))
+                else if (stringComparer.Equals("setRel", code))
                 {
-                    stageControls.SetRelative(code);
+                    SetRelative(splitInput);
                 }
-                else if (stringComparer.Equals("pos", code.Split()[0]))
+                else if (stringComparer.Equals("pos", code))
                 {
-                    stageControls.Position(code);
+                    Position(splitInput);
                 }
-                else if (stringComparer.Equals("vel", code.Split()[0]))
+                else if (stringComparer.Equals("vel", code))
                 {
-                    stageControls.Velocity(code);
+                    Velocity(splitInput);
                 }
-                else if (stringComparer.Equals("accel", code.Split()[0]))
+                else if (stringComparer.Equals("accel", code))
                 {
-                    stageControls.Acceleration(code);
+                    Acceleration(splitInput);
                 }
-                else if (stringComparer.Equals("decel", code.Split()[0]))
+                else if (stringComparer.Equals("decel", code))
                 {
-                    stageControls.Deceleration(code);
+                    Deceleration(splitInput);
                 }
                 else if (stringComparer.Equals("reset", code))
                 {
@@ -95,18 +97,177 @@ namespace QMProjectT
                 }
                 else
                 {
-                    stageConnection.WriteRead(code);
+                    stageConnection.WriteRead(input);
                 }
 
             }
         }
         static public void Sequance1()
         {
-            stageControls.MoveAbsolute('x', 12000);
-            stageControls.MoveAbsolute('x', 120000);
-            stageControls.MoveAbsolute('y', 50000);
-            stageControls.MoveAbsolute('x', -100000);
+            stageControls.MoveAbsolute("x", 120000);
+            stageControls.MoveAbsolute("x", 20000);
+            stageControls.MoveAbsolute("y", 50000);
+            stageControls.MoveAbsolute("x", 100000);
 
+        }
+        static public void Deceleration(string[] input)
+        {
+            try
+            {
+                var axis = input[1];
+                try
+                {
+                    int pos = Int32.Parse(input[2]);
+                    stageControls.Deceleration(axis, pos);
+                }
+                catch
+                {
+                }
+                stageControls.Deceleration(axis, null);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Console.WriteLine("no axis given");
+            }
+        }
+        static public void Acceleration(string[] input)
+        {
+            try
+            {
+                var axis = input[1];
+                try
+                {
+                    int pos = Int32.Parse(input[2]);
+                    stageControls.Acceleration(axis, pos);
+                }
+                catch
+                {
+                }
+                stageControls.Acceleration(axis, null);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Console.WriteLine("no axis given");
+            }
+        }
+        static public void Velocity(string[] input)
+        {
+            try
+            {
+                var axis = input[1];
+                try
+                {
+                    int pos = Int32.Parse(input[2]);
+                    stageControls.Velocity(axis, pos);
+                }
+                catch
+                {
+                }
+                stageControls.Velocity(axis, null);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Console.WriteLine("no axis given");
+            }
+        }
+        static public void Position(string[] input)
+        {
+            try
+            {
+                var axis = input[1];
+                try
+                {                   
+                    int pos = Int32.Parse(input[2]);
+                    stageControls.Position(axis, pos);
+                }
+                catch
+                {                   
+                }
+                stageControls.Position(axis, null);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Console.WriteLine("no axis given");
+            }
+        }
+        static public void SetAbsolute(string[] input)
+        {           
+            try
+            {
+                var axis = input[1];
+                stageControls.SetAbsolute(axis);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Console.WriteLine("no axis given");
+            }
+        }
+        static public void SetRelative(string[] input)
+        {
+            try
+            {
+                var axis = input[1];
+                stageControls.SetRelative(axis);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Console.WriteLine("no axis given");
+            }
+        }
+        static public void MoveX(string[] input)
+        {
+            try
+            {
+                int value = Int32.Parse(input[1]);
+                stageControls.MoveX(value);
+            }
+            catch
+            {
+                Console.WriteLine("no position/distance given");
+            }
+        }
+        static public void MoveY(string[] input)
+        {
+            try
+            {
+                int value = Int32.Parse(input[1]);
+                stageControls.MoveY(value);
+            }
+            catch
+            {
+                Console.WriteLine("no position/distance given");
+            }
+        }
+        static public void MoveAbsolute(string[] input)
+        {
+            string axis;
+            int position;
+            try
+            {
+                axis = input[1];
+                position = Int32.Parse(input[2]);
+                stageControls.MoveAbsolute(axis, position);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Console.WriteLine("no axis or no position given");
+            }           
+        }
+        static public void MoveRelative(string[] input)
+        {
+            string axis;
+            int position;
+            try
+            {
+                axis = input[1];
+                position = Int32.Parse(input[2]);
+                stageControls.MoveRelative(axis, position);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Console.WriteLine("no axis or no position given");
+            }
         }
     }
 }
+

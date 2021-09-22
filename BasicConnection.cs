@@ -19,17 +19,12 @@ namespace QMProjectT
             ComPortName = "COM" + ComPortNum;
             Console.WriteLine($"intializing at {ComPortName}");
 
-
-        }
-
-        public void OpenConnection()
-        {
             try
             {
                 base.PortName = ComPortName;
                 base.Open();
-                this.Clear();
-                Console.WriteLine("opened");
+                Console.WriteLine("connection opened");
+                this.Clear();               
             }
             catch (UnauthorizedAccessException)
             {
@@ -45,23 +40,23 @@ namespace QMProjectT
         {
             /* 
              * read until nothing to read
-             */
-            while(true)
+             */           
+            while (true)
             {
                 try
                 {
-                    this.Recv();
+                    Read(true);
                 }
                 catch (TimeoutException)
                 {
                     break;
                 }
             }
-            Console.WriteLine("clear completed");
+            Console.WriteLine("output cleared");
         }
             
 
-        public void Send(string code)
+        public string Write(string code, bool read = true, bool silent=false)
         {
             try
             {
@@ -76,21 +71,37 @@ namespace QMProjectT
                 string error = "Failed to read response";
                 Console.WriteLine(error);         
             }
+
+            if (!read)
+            {
+                return "read is off";
+            }
+            return Read(silent);
+
         }
 
-        public string Recv()
+        public string Read(bool silent = false)
         {
             try
             {
                 string response = base.ReadTo("\r");
-                Console.WriteLine($"response: {response}");
+
+                if (!silent)
+                {
+                    Console.WriteLine($"response: {response}");
+                }
                 return response;
             }
             catch (TimeoutException ex)
             {
-                string error = "Failed to read response";
-                Console.WriteLine(error);
+                if (!silent)
+                {
+                    string error = "Failed to read response";
+                    Console.WriteLine(error);
+                }
+
                 throw ex;
+                //return "ex";
             }
         }
 
@@ -99,11 +110,13 @@ namespace QMProjectT
             base.Close();
         }
 
-        public string WriteRead(string code)
+        public string WriteRead(string code, bool silent=false)
         {
-            this.Send(code);
-            string response = this.Recv();
+            this.Write(code);
+            string response = this.Read(silent);
             return response;
         }
+
+        
     }
 }

@@ -1,0 +1,7 @@
+C:\WORK\Tektronix-project\QMprogram\version2\QMProject\obj\x86\Debug\QMProjectTektronix.csprojAssemblyReference.cache
+C:\WORK\Tektronix-project\QMprogram\version2\QMProject\obj\x86\Debug\QMProjectTektronix.csproj.CoreCompileInputs.cache
+C:\WORK\Tektronix-project\QMprogram\version2\QMProject\bin\Debug\ConsoleApplication.exe.config
+C:\WORK\Tektronix-project\QMprogram\version2\QMProject\bin\Debug\ConsoleApplication.exe
+C:\WORK\Tektronix-project\QMprogram\version2\QMProject\bin\Debug\ConsoleApplication.pdb
+C:\WORK\Tektronix-project\QMprogram\version2\QMProject\obj\x86\Debug\ConsoleApplication.exe
+C:\WORK\Tektronix-project\QMprogram\version2\QMProject\obj\x86\Debug\ConsoleApplication.pdb

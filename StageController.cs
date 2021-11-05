@@ -12,6 +12,7 @@ namespace QMProjectT
         public bool Moving { get; private set; } = false;
         public IDictionary<int, string> Errors { get; private set; }
         public IDictionary<string, bool> JoyStickDict { get; private set; }
+
         //public IDictionary<string, bool> MovingDict { get; private set; }
 
 

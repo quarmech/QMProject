@@ -7,27 +7,27 @@ using System.Threading.Tasks;
 namespace QMProjectT
 {
     public class Routines
-    {
-        
+    {    
         static public bool Stop { get; set; } = false;
 
-        static Routines()
-        {
-
-        }
-        static public async Task R2(StageController sc, AlignerController ac, int size)
+        static Routines(){}
+        static public async Task PickUpWaferAndAlign(StageController sc, AlignerController ac, int size)
         {
             int count = 0;
             Stop = false;
             while(!Stop)
             {
                 await WaferPickUpPosition(sc, ac);
-                await R1(sc, ac, size);
+                await AlignWafer(sc, ac, size);
                 count += 1;
                 Console.WriteLine("count:"+count);
-            }
-            
+            }          
         }
+        /*
+         * Q: will this complete before another command: appears?
+         * what if I remove the await in UserInputHandler?
+         * 
+         */
 
         static public async Task WaferPickUpPosition(StageController sc, AlignerController ac)
         {
@@ -53,10 +53,10 @@ namespace QMProjectT
 
             await ac.MoveUp();
             await ac.CheckUp();
-            Console.WriteLine("finished WaferPickUpPosition");
+            Console.WriteLine("ready for wafer");
         }
 
-        static public async Task R1(StageController sc, AlignerController ac, int size)
+        static public async Task AlignWafer(StageController sc, AlignerController ac, int size)
         {          
             //await Task.WhenAll(sc.MoveAbsoluteAsync("x", Positions.PosLimit["x"]), sc.MoveAbsoluteAsync("y", Positions.Center["y"]) );
             //await Task.Delay(3000);
@@ -69,10 +69,11 @@ namespace QMProjectT
 
             //ungrip
             await sc.Fsol(2, "on");
-            await Task.Delay(1000);
+            //TODO: check if delay enought
+            await Task.Delay(100);
             //check gripper status via presence sensor
-            bool closed = await sc.GripperClosed();
-            if (closed)
+            bool isClosed = await sc.GripperClosed();
+            if (isClosed)
             {
                 Console.WriteLine("gripper did not open");
                 Stop = true;
@@ -115,29 +116,12 @@ namespace QMProjectT
             //Move up with vacuum
             await ac.ZVacuumUp();
             
-
-
             //tODO: wait for up
             await ac.CheckUp();
             //check z status.
             //check vacuum
             await ac.WaitVacuumOn();
-            /*
-            await Task.Delay(10000);
-            vacuum = await ac.VacuumStatus();
-            if (!vacuum)
-            {
-                Console.WriteLine("vacuum is off");
-                await Task.Delay(10000);
-                vacuum = await ac.VacuumStatus();
-                if (!vacuum)
-                {
-                    Console.WriteLine("vacuum is off");
-                    Stop = true;
-                    return;
-                }
-            }
-            */
+
             //clear error log
             await ac.Escape();
             //align wafer
@@ -147,7 +131,7 @@ namespace QMProjectT
             await Task.Delay(2000);
             await ac.CheckAlign();
             
-            Console.WriteLine("finished routine1");
+            Console.WriteLine("wafer aligned");
         }
         static public void Sequence1(StageController sc, AlignerController ac)
         {

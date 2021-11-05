@@ -111,17 +111,17 @@ namespace QMProjectT
             {
                 Routines.Sequence5(sc, ac);
             }
-            else if (stringComparer.Equals("routine1", code))
+            else if (stringComparer.Equals("alignwafer", code))
             {
-                await Routines.R1(sc, ac, 300);
+                await Routines.AlignWafer(sc, ac, 300);
             }
             else if (stringComparer.Equals("pickupwafer", code))
             {
                 await Routines.WaferPickUpPosition(sc, ac);
             }
-            else if (stringComparer.Equals("routine2", code))
+            else if (stringComparer.Equals("pickupandalign", code))
             {
-                await Routines.R2(sc, ac, 300);
+                await Routines.PickUpWaferAndAlign(sc, ac, 300);
             }
             else if (stringComparer.Equals("error", code))
             {

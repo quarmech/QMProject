@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 
-namespace QMProjectT
+namespace QMProjectTektronix
 {
     public class AlignerController
     {
@@ -169,12 +169,26 @@ namespace QMProjectT
 
         public async Task Align()
         {
+            await Escape();
             string ascii = "APF";
             Command command = new Command(ascii);
             _conn.AddCommand(command);
             string res = await command.TSC.Task;
         }
 
+        public async Task RotateWafer(string n)
+        {
+            await Escape();
+            
+            string head = "MAM ";
+            string tail = "000";
+            string ascii = head + n + tail;
+
+            Command command = new Command(ascii);
+            _conn.AddCommand(command);
+            string res = await command.TSC.Task;
+        }
+     
         public void Command(string s)
         {
             Command command = new Command(s, true, true);

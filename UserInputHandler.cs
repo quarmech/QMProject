@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace QMProjectT
+namespace QMProjectTektronix
 {
     public class UserInputHandler
     {
@@ -109,9 +109,17 @@ namespace QMProjectT
             {
                 Routines.Sequence5(sc, ac);
             }
-            else if (stringComparer.Equals("alignwafer", code))
+            else if (stringComparer.Equals("alignwafer300", code))
             {
                 await Routines.AlignWafer(sc, ac, 300);
+            }
+            else if (stringComparer.Equals("alignwafer200", code))
+            {
+                await Routines.AlignWafer(sc, ac, 200);
+            }
+            else if (stringComparer.Equals("alignwafer150", code))
+            {
+                await Routines.AlignWafer(sc, ac, 150);
             }
             else if (stringComparer.Equals("pickupwafer", code))
             {
@@ -209,6 +217,10 @@ namespace QMProjectT
             else if (stringComparer.Equals("ungrip", code))
             {
                 sc.Fsol(2, "on");
+            }
+            else if (stringComparer.Equals("rotatewafer", code))
+            {
+                RotateWafer(splitInput);
             }
             else
             {
@@ -314,6 +326,21 @@ namespace QMProjectT
         {
             sc.Reset();
             Console.WriteLine("completed reset");
+        }
+
+        public async Task RotateWafer(string[] input)
+        {
+            try
+            {
+                var value = input[1];
+                //Int32.TryParse(Split()[1], out int n);
+                await ac.RotateWafer(value);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Console.WriteLine("no value given");
+            }
+
         }
         public async Task Error(string[] input)
         {

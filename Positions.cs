@@ -4,19 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QMProjectT
+namespace QMProjectTektronix
 {
     public class Positions
     {
         public static IDictionary<string, int> Center { get; private set; }
         public static IDictionary<string, int> PosLimit { get; private set; }
-        public static IDictionary<int, int> YAlignLocation { get; private set; }
 
         public static int XAlignLocation = 317955;
 
-        public static int YAlignLocation150 = 2460;
-        public static int YAlignLocation200 = 27552;
-        public static int YAlignLocation300 = 77762;
+        public static IDictionary<int, int> YAlignLocations = new Dictionary<int, int>()
+        {
+                { 150, 2460 },
+                { 200, 27552 },
+                { 300, 77762 }
+        };
 
         public static int XCenter = 159480;
         public static int YCenter = 155083;
@@ -46,11 +48,7 @@ namespace QMProjectT
                 { "t", 10494 },
                 { "tNegative",  -12547 }
             };
-            YAlignLocation = new Dictionary<int, int>() {
-                { 150, 2460 },
-                { 200, 27552 },
-                { 300, 77762 }   
-            };
+            
         }
 
     }

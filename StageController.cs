@@ -1,10 +1,11 @@
+//using QMProjectTektronix;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace QMProjectT
+namespace QMProjectTektronix
 {
     public class StageController
     {
@@ -608,7 +609,8 @@ namespace QMProjectT
                 //await CheckMoveComplete(axis);
                 Console.WriteLine("axis not homed");
                 //throw new Exception("not homed");
-                return;
+                throw new OperationFailedException("axis not homed");
+                //return;
             }
 
             await SetAbsolute(axis);
@@ -963,6 +965,25 @@ namespace QMProjectT
                 return true;
             }
             return false;
+        }
+
+        public async Task WaitForWafer()
+        {
+            
+            
+            for (int i = 0; i < 100; i++)
+            {
+                
+                bool status = await WaferSensor();
+
+                if (status)
+                {
+                    return;
+                }
+                await Task.Delay(1000);
+            }
+            
+            throw new OperationFailedException("no  wafer detected");
         }
 
         public async Task<bool> TBreakOn()

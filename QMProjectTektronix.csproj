@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AlignerController.cs" />
+    <Compile Include="OperationFailedException.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="Connection.cs">
       <SubType>Component</SubType>

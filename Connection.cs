@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Concurrent;
 
-namespace QMProjectT
+namespace QMProjectTektronix
 {
     public class Connection : SerialPort
     {

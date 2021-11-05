@@ -13,12 +13,10 @@ namespace QMProjectT
 
         private  StringComparer stringComparer = StringComparer.OrdinalIgnoreCase;
 
-        //private Sequences sequences;
         public UserInputHandler(StageController stageControls, AlignerController alignerControls)
         {
             sc = stageControls;
-            ac = alignerControls;
-            //sequences = new Sequences(sc, ac);
+            ac = alignerControls;     
         }
   
         public async Task<string> UserCommand(string command)
@@ -203,6 +201,14 @@ namespace QMProjectT
             else if (stringComparer.Equals("waferstatus", code))
             {
                 WaferStatus();
+            }
+            else if (stringComparer.Equals("grip", code))
+            {
+                sc.Fsol(1, "on");
+            }
+            else if (stringComparer.Equals("ungrip", code))
+            {
+                sc.Fsol(2, "on");
             }
             else
             {

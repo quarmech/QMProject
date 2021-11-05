@@ -27,12 +27,7 @@ namespace QMProjectT
             string ascii = "ESC";
             Command command = new Command(ascii);
             _conn.AddCommand(command);
-            string res = await command.TSC.Task;
-            //_conn.Write("ESC", false);
-        }
-        public void motionStatus()
-        {
-            _conn.Write("MD", false);            
+            string res = await command.TSC.Task;          
         }
 
         public async Task<string> Home()

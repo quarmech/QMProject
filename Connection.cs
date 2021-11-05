@@ -274,7 +274,7 @@ namespace QMProjectT
                     Console.WriteLine("port is closed, could not read");
                     return null;
                 }
-            }     
+            }
         }
 
         public byte[] ConcatArray(byte[] head, byte[] tail, int tailOffset, int tailCount)

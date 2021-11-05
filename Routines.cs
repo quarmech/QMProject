@@ -23,11 +23,6 @@ namespace QMProjectTektronix
                 Console.WriteLine("count:"+count);
             }          
         }
-        /*
-         * Q: will this complete before another command: appears?
-         * what if I remove the await in UserInputHandler?
-         * 
-         */
 
         static public async Task WaferPickUpPosition(StageController sc, AlignerController ac)
         {
@@ -36,7 +31,7 @@ namespace QMProjectTektronix
                 //pick up wafer
                 await sc.MoveAbsoluteAsync("x", Positions.XAlignLocation);
                 //await sc.CheckMoveComplete("x");
-                await sc.MoveAbsoluteAsync("y", Positions.YCenter);
+                await sc.MoveAbsoluteAsync("y", Positions.Center["y"]);
                 await sc.CheckMoveComplete("y");
 
                 //await Task.WhenAll(sc.MoveAbsoluteAsync("x", Positions.PosLimit["x"]), sc.MoveAbsoluteAsync("y", Positions.Center["y"]) );

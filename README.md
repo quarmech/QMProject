@@ -2,28 +2,55 @@
 
 ## Classes:
 
-Program - Main program; contains user input loop
+Main - Intializes connections and controllers, opens ports, being user input loop
 
-ConsoleApp - Functions to handle user input and send to StageControls
+UserInputHandler - Gets user input string, modifies, and sends to contorollers
 
-StageControls - Sends ASCII commands to driver
+StageController - Sends ASCII commands to move X,Y,Z,T
 
-BasicConnection - Serial port connection, communication with driver
+AlignerController - Sends ASCII commands to move aligner
 
-todo: 
+Connection - Serial port connection, read/writes commands, Handles Command Queue
 
-AlignerContorls - Sends commands to aligner
 
 ## Description:
 
-Currently this program is to test the drivers and motors, but I'm hoping some classes can be used in the final UI. I'm making the StageControl  and AlignerContorls classes so that they can be used with any UI. Please advice how I can do this better.
 
-## Async serial port:
+## Commands:
 
-BasicConnection does not use asyn serial port reading. In my use case it's unnecessary because reading is fast and most operations require to wait for response anyway.
+End and Exit: quit
 
-But I have been thinking about how to make async and reading this: [https://www.sparxeng.com/blog/software/must-use-net-system-io-ports-serialport](https://www.sparxeng.com/blog/software/must-use-net-system-io-ports-serialport).
+Reset all Amplifiers: reset
 
-## Async Waiting for move to complete
+Home an axis: home <axis>
 
-Currently when a move happens Wait() is run to wait for the move to complete. I'm try to figure out the best way to make this async. The axis in motion should be blocked so a second move cannot start before first one is complete.
+Move by Absolute: moveAbs <axis> <value>
+
+Move by Relative: moverel <axis> <value>
+
+Get Position: pos <axis>
+
+Get/Set velocity: vel <axis> <value>
+
+Get/Set move distance: dis <axis> <value>
+
+Get/Set acceleration: accel <axis> <value>
+
+Get/Set deceleration: decel <axis> <value>
+
+Activate Joystick Fast mode: joyfast <axis>
+
+Activate Joystick slow mode: joyfast <axis>
+
+Turn off joystick: joyoff <axis>
+
+Read Error codes: error <axis>
+
+Turn on motor: on <axis>
+Turn off motor: off <axis>
+
+Run routine Align 300mm: alignwafer300
+Run routine Align 200mm: alignwafer200
+Run routine Align 150mm: alignwafer150
+Run routine go to wafer pick position: pickupwafer
+

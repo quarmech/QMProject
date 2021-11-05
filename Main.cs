@@ -24,34 +24,23 @@ namespace QMProjectTektronix
             
             stageControls.SetupMotors();
             alignerConnection.OpenPort();
-            //alignerConnection.ReadingLoop();
-
-            //ping stages
-            
+            //alignerConnection.ReadingLoop();              
 
             //main program loop
+            Console.Write($"Command:");
             while (!End)
-            {
-                Console.Write($"Command:");
+            {               
                 string input = Console.ReadLine();
 
-                 consoleApp.UserCommand(input);              
+                consoleApp.UserCommand(input);              
             }
-
             await EndProcedure();
-
-
         }
 
         public static async Task EndProcedure()
         {
-            //end procedure of aligner
-            //end procdedure of stage
-            //close aligner port
-            //close stage port
             await stageControls.End();
             await alignerContorls.End();
-
         }
               
 

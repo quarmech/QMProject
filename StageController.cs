@@ -616,7 +616,7 @@ namespace QMProjectTektronix
             await SetAbsolute(axis);
             await Distance(axis, pos);
             await MoveAsync(axis);
-            Console.WriteLine("done moving");
+            
             //return "moving done";
 
         }

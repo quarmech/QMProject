@@ -424,37 +424,7 @@ namespace QMProjectTektronix
                 await Task.Delay(1000);
             }
         }
-        /*
-        public async Task<int> WaitAsync(string axis, int previousPos)
-        {
-            int errorCode = 0;// Error(axis);
-            int currentPos = await Position(axis);
-            int bit27 = 134217728;
-
-            //Check if done moving or stuck in same position
-            if (((errorCode & bit27) != bit27) || currentPos == previousPos)
-            {
-                Moving = false;
-            }
-            return previousPos;
-        }
-        private async Task<int> MoveDoneAsync(string axis)
-        {
-            int res = -1;
-            Moving = true;
-            while (Moving)
-            {
-                //Console.WriteLine("in MoveDoneAsync Loop");
-                int previousPos = await Position(axis);
-                await Task.Delay(1000);
-                res = await Task.Run(() => WaitAsync(axis, previousPos));
-            }
-            return res;
-        }
-        */
-        
-
-
+ 
         public int Home(string axis)
         {
             

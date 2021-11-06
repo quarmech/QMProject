@@ -143,71 +143,8 @@ namespace QMProjectTektronix
                 Console.WriteLine("operation failed");
             }
         }
-        static public void Sequence1(StageController sc, AlignerController ac)
-        {
-            int cycles = 0;
-            while (true)
-            {
-                sc.Home("x");
-                sc.MoveRelative("x", 500000);
-                sc.Home("y");
-                sc.MoveRelative("y", 500000);
-                sc.Home("t");
-                sc.MoveAbsolute("t", 20000);
-                sc.MoveAbsolute("t", -20000);
-                sc.Home("z");
-                sc.MoveAbsolute("z", 1000000);
-                cycles += 1;
-                Console.WriteLine($"cycles: {cycles}");
-                //Thread.Sleep(5000);
-            }
-
-
-
-            //sc.MoveAbsolute("x", 20000);
-            /*
-            sc.MoveAbsolute("t", 20000);
-            sc.MoveAbsolute("t", -20000);
-            sc.MoveAbsolute("z", 0);
-            sc.MoveAbsolute("z", 1000000);
-            */
-        }
-        static public async void Sequence2(StageController sc, AlignerController ac)
-        {
-            for (int i = 0; i < 100; i++)
-            {
-
-                //sc.MoveRelative("z", -20000);
-                await sc.HomeAsync("z");
-                await sc.MoveRelativeAsync("z", 1000000);
-
-            }
-        }
-        static public void Sequence3(StageController sc, AlignerController ac)
-        {
-            for (int i = 0; i < 10; i++)
-            {
-                sc.MoveRelative("x", 30000);
-                sc.MoveRelative("y", 30000);
-                sc.MoveRelative("x", -30000);
-                sc.MoveRelative("y", -30000);
-            }
-        }
-        static public void Sequence4(StageController sc, AlignerController ac)
-        {
-            for (int i = 0; i < 600; i++)
-            {
-
-                //sc.MoveRelative("z", -20000);
-                sc.Home("z");
-                sc.MoveRelative("z", 1000000);
-                sc.Home("t");
-                sc.MoveRelative("t", 200000);
-                sc.MoveRelative("t", -200000);
-
-            }
-        }
-        static public async Task Sequence5(StageController sc, AlignerController ac)
+        
+        static public async Task Routine1(StageController sc, AlignerController ac)
         {
             while (!Stop)
             {

@@ -39,7 +39,7 @@ namespace QMProjectTektronix
 
         public static async Task EndProcedure()
         {
-            await stageControls.End();
+            stageControls.End();
             await alignerContorls.End();
         }
               

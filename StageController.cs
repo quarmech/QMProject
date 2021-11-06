@@ -89,41 +89,26 @@ namespace QMProjectTektronix
             _conn.AddCommand(new Command($"{Axis(axis)} s r0xab 0", true, false));
         }
 
-        public async Task Stop(string axis)
+        public void Stop(string axis)
         {
             string ascii = $"{Axis(axis)} t 0";
             Command command = new Command(ascii);
-            _conn.AddCommand(command);
-            var res = await command.TSC.Task;
+            _conn.AddCommand(command);         
         }
 
-        public async Task Stop()
-        {
-            /*
-            Command stopX = new Command($"0 t 0");
-            Command stopY = new Command($"1 t 0");
-            Command stopZ = new Command($"2 t 0");
-            Command stopT = new Command($"3 t 0");
-
-            _conn.AddCommand(stopX);
-            _conn.AddCommand(stopY);
-            _conn.AddCommand(stopZ);
-            _conn.AddCommand(stopT);
-            */
-            //await Task.WhenAll(stopX.TSC.Task, stopY.TSC.Task, stopZ.TSC.Task, stopT.TSC.Task);
-            await Stop("x");
-            await Stop("y");
-            await Stop("z");
-            await Stop("t");
+        public void Stop()
+        {          
+            Stop("x");
+            Stop("y");
+            Stop("z");
+            Stop("t");
         }
-        public async Task End()
+        public void End()
         {
             //turn of joystick
             JoyStickOff();
             //stop all motors
-            await Stop();
-            //wait for processes to end
-            //Thread.Sleep(500); 
+            Stop();
             //close port
             _conn.End();
         }

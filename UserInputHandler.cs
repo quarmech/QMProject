@@ -263,11 +263,8 @@ namespace QMProjectTektronix
         }
         
 
-        public async Task Quit()
-        {         
-            //await sc.End();
-            //await ac.End();
-          
+        public void Quit()
+        {                
             Program.End = true;
         }
         public void Stop()

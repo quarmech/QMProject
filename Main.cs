@@ -17,7 +17,7 @@ namespace QMProjectTektronix
 
         public static bool End = false;
         
-        public static async Task Main()
+        public static void Main()
         {
             
             stageConnection.OpenPort();

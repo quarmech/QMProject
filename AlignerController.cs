@@ -30,7 +30,7 @@ namespace QMProjectTektronix
             string res = await command.TSC.Task;          
         }
 
-        public async Task<string> Home()
+        public async Task<string> MoveDown()
         {
             string ascii = "ZMD";
             Command command = new Command(ascii);
@@ -53,7 +53,7 @@ namespace QMProjectTektronix
             return false;
         }
 
-        public async Task CheckHome()
+        public async Task WaitForMoveDown()
         {
             while(true)
             {

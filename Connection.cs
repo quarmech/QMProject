@@ -27,8 +27,8 @@ namespace QMProjectTektronix
 
             ReadWriteTime = RWTime;
 
-            base.ReadTimeout = ReadWriteTime;
-            base.WriteTimeout = ReadWriteTime;
+            base.ReadTimeout = 1000;
+            base.WriteTimeout = 1000;
             
             ComPortName = "COM" + ComPortNum;
             Console.WriteLine($"intializing at {ComPortName}");                   
@@ -84,6 +84,7 @@ namespace QMProjectTektronix
             commandQueue.Add(command);
         }
 
+        //Writes and Reads a Command
         public async Task ProcessCommand(Command command)
         {          
             string res = "";

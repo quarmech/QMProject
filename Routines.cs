@@ -98,9 +98,9 @@ namespace QMProjectTektronix
                 }
 
                 //move wafer down
-                var a = await ac.Home();
+                var a = await ac.MoveDown();
                 //wait for chuck to be down
-                await ac.CheckHome();
+                await ac.WaitForMoveDown();
                 //center wafer (grip)
                 await sc.Fsol(1, "on");
                 await Task.Delay(500);

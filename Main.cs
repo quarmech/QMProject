@@ -34,13 +34,13 @@ namespace QMProjectTektronix
 
                 UserInputHandler.UserCommand(input);              
             }
-            await EndProcedure();
+            EndProcedure();
         }
 
-        public static async Task EndProcedure()
+        public static void EndProcedure()
         {
             stageControls.End();
-            await alignerContorls.End();
+            alignerContorls.End();
         }
               
 

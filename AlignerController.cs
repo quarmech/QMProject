@@ -16,7 +16,7 @@ namespace QMProjectTektronix
             _conn = comm;
         }
 
-        public async Task End()
+        public void End()
         {         
             //close port
             _conn.End();

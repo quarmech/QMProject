@@ -13,7 +13,7 @@ namespace QMProjectTektronix
         static StageController stageControls = new StageController(stageConnection);
         static AlignerController alignerContorls = new AlignerController(alignerConnection);
 
-        static UserInputHandler consoleApp = new UserInputHandler(stageControls, alignerContorls);
+        static UserInputHandler UserInputHandler = new UserInputHandler(stageControls, alignerContorls);
 
         public static bool End = false;
         
@@ -32,7 +32,7 @@ namespace QMProjectTektronix
             {               
                 string input = Console.ReadLine();
 
-                consoleApp.UserCommand(input);              
+                UserInputHandler.UserCommand(input);              
             }
             await EndProcedure();
         }

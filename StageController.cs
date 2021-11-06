@@ -1,4 +1,3 @@
-//using QMProjectTektronix;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,13 +8,12 @@ namespace QMProjectTektronix
 {
     public class StageController
     {
-        public Connection _conn;       
+        public Connection _conn;
         public bool Moving { get; private set; } = false;
         public IDictionary<int, string> Errors { get; private set; }
         public IDictionary<string, bool> JoyStickDict { get; private set; }
 
         //public IDictionary<string, bool> MovingDict { get; private set; }
-
 
         public StageController(Connection comm)
         {
@@ -25,29 +23,23 @@ namespace QMProjectTektronix
                 _conn = comm;
                 AddErrorBits();
                 //SetupAxis();
-                SetupJoystick();
-                //Reset();
-                //SetupMotors();
+                SetupJoystick();              
             } 
             catch 
             {
                 Console.WriteLine("Error: Could not connect to Stages");
             }
-  
         }
-
 
         public void SetupMotors()
         {
             Console.WriteLine("seting up stage controls...");
 
-            //Activate all motors
-            
+            //Activate all motors          
             MotorOn("x");
             MotorOn("y");
             MotorOn("z");
-            MotorOn("t");
-            
+            MotorOn("t");   
             
             //_conn.Write("0 s r0xab 1", true);
             //_conn.Write("1 s r0xab 1", true);
@@ -59,14 +51,12 @@ namespace QMProjectTektronix
             _conn.Write("2 s r0x24 21", true);
             _conn.Write("3 s r0x24 21", true);
             */
-            //set to position loop control
-            
+            //set to position loop control          
             _conn.AddCommand(new Command("0 s r0x24 21", true, false));
             _conn.AddCommand(new Command("0 s r0x24 21", true, false));
             _conn.AddCommand(new Command("0 s r0x24 21", true, false));
             _conn.AddCommand(new Command("0 s r0x24 21", true, false));
             
-
             //default values
             Distance("x", 0);
             Distance("y", 0);
@@ -86,15 +76,16 @@ namespace QMProjectTektronix
             Deceleration("z", 200000);
             Deceleration("t", 200000);
             
-        }    
+        }
+
+
         
         public void MotorOn(string axis)
         {
             _conn.AddCommand(new Command($"{Axis(axis)} s r0xab 1", true, false));          
         }
         public void MotorOff(string axis)
-        {
-            //_conn.Write($"{Axis(axis)} s r0xab 0");
+        {          
             _conn.AddCommand(new Command($"{Axis(axis)} s r0xab 0", true, false));
         }
 
@@ -105,7 +96,6 @@ namespace QMProjectTektronix
             _conn.AddCommand(command);
             var res = await command.TSC.Task;
         }
-
 
         public async Task Stop()
         {
@@ -129,11 +119,11 @@ namespace QMProjectTektronix
         public async Task End()
         {
             //turn of joystick
-            await JoyStickOff();
+            JoyStickOff();
             //stop all motors
             await Stop();
             //wait for processes to end
-            //Thread.Sleep(500);    
+            //Thread.Sleep(500); 
             //close port
             _conn.End();
         }
@@ -220,38 +210,24 @@ namespace QMProjectTektronix
             string res = await command.TSC.Task;
             JoyStickDict[axis] = true;
             JoyStickLimitCheck(axis);
-
-            /*
-            _conn.Write($"{Axis(axis)} i r0 32770");
-            JoyStickDict[axis] = true;
-            if (axis=="z")
-            {               
-                await LimitCheckAsync(axis);
-            } 
-            */
         }
-        public async Task JoyStickOff(string axis)
+        public void JoyStickOff(string axis)
         {
             string ascii = $"{Axis(axis)} i r0 32771";
             Command command = new Command(ascii);
             _conn.AddCommand(command);
-            string res = await command.TSC.Task;
-            //_conn.Write($"{Axis(axis)} i r0 32771");
             JoyStickDict[axis] = false;
         }    
-        public async Task JoyStickOff()
+        public void JoyStickOff()
         {
-             await JoyStickOff("x");
-             await JoyStickOff("y");
-             await JoyStickOff("z");
-             await JoyStickOff("t");
+             JoyStickOff("x");
+             JoyStickOff("y");
+             JoyStickOff("z");
+             JoyStickOff("t");
         }
      
         private async Task JoyStickLimitCheck(string axis)
         {
-            //limit reached - turn off joystick
-            //if under sensor - dont do anything
-            //else start check loop
             bool limitReached = false;
             int errorCode = await Error(axis);
             int posLimitBit = pow2(9);
@@ -269,118 +245,32 @@ namespace QMProjectTektronix
                 {
                     int errorCodeN = await Error(axis);
 
-
                     if (((errorCodeN & negLimitBit) == negLimitBit) ||
                         ((errorCodeN & posLimitBit) == posLimitBit))
                     {
-                        //int row = Console.CursorTop;
-                        //Console.SetCursorPosition(20, row - 1);
                         if (!limitReached)
                         {
                             Console.WriteLine("limit reached");
                             limitReached = true;
-                            await JoyStickOff(axis);
-                            //wait 3 seconds turn on joystick
+                            JoyStickOff(axis);
+                            //wait n seconds turn on joystick
                             await JoyStickDelayedOn(axis);
                         }
-                        //Console.SetCursorPosition(10, row);
-                        //JoyStickOff(axis);
-                        //limitReached = true;
                     }
                     else
                     {
                         limitReached = false;
                     }
-
-
-                    //check negative limit
-                    /*
-                    if ((errorCode & negLimitBit) == negLimitBit)
-                    {
-                        Console.WriteLine("negative limit reached");
-                        JoyStickOff(axis);
-                        //await Task.Delay(500);
-                        //await MoveRelativeAsync(axis, 1000);
-                        //JoyStickFast(axis);
-                    }
-                    if ((errorCode & posLimitBit) == posLimitBit)
-                    {
-                        Console.WriteLine("positive limit reached");
-                        JoyStickOff(axis);
-                        await Task.Delay(100);
-                        await MoveRelativeAsync(axis, -1000);
-                        //JoyStickSlow(axis);
-                    }
-                    */
-
                     await Task.Delay(50);
                 }
             }
-
         }
-
 
         public async Task JoyStickDelayedOn(string axis)
         {
             await Task.Delay(2000);
             await JoyStickFast(axis);
         }
-
-
-        /*
-        private async Task LimitCheckAsync(string axis)
-        {
-            bool limitReached = false;
-            //await Task.Delay(5000);
-            while (!limitReached)
-            {
-                //limitReached = await Task.Run(() => LimitCheck(axis));
-                await Task.Delay(100);
-            }
-            JoyStickOff(axis);
-            //await Task.Delay(1000);          
-        }
-
-        public async Task<bool> LimitCheck(string axis)
-        {
-            int errorCode = await Error(axis);
-            int posLimitBit = pow2(9);
-            int negLimitBit = pow2(10);
-
-            if (((errorCode & negLimitBit) == negLimitBit) ||
-                ((errorCode & posLimitBit) == posLimitBit))
-            {
-                return true;
-            }
-
-            return false;
-        }
-        */
-        /*
-        public async Task<int> Wait(string axis)
-        {
-            int previousPos = await Position(axis);
-            int count = 0;
-            while (true)
-            {
-                int errorCode = 0;// Error(axis);
-                int currentPos = await Position(axis);
-                int bit27 = 134217728;
-
-                //Check if done moving or stuck in same position
-                if ((errorCode & bit27) != bit27 || count >= 10)
-                {
-                    Moving = false;
-                    return currentPos;
-                }
-                if (currentPos == previousPos)
-                {
-                    count += 1;
-                    previousPos = currentPos;
-                }
-            }
-        }
-        */
 
         public async Task<bool> CheckMoveComplete(string axis)
         {

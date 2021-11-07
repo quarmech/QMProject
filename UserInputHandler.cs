@@ -363,23 +363,21 @@ namespace QMProjectTektronix
 
         public void Deceleration(string[] input)
         {
-            try
-            {
-                var axis = input[1];
-                try
-                {
-                    int pos = Int32.Parse(input[2]);
-                    sc.Deceleration(axis, pos); //set
-                }
-                catch (IndexOutOfRangeException)
-                {
-                    sc.Deceleration(axis, null); //get
-                    //Print(res);
-                }
-            }
-            catch (IndexOutOfRangeException)
+            string axis;
+            if (input.Length == 1)
             {
                 Console.WriteLine("no axis given");
+            }
+            else if (input.Length == 2) //get
+            {
+                axis = input[1];
+                sc.Deceleration(axis, null);
+            }
+            else if (input.Length == 3) //set
+            {
+                axis = input[1];
+                int.TryParse(input[2], out int value);
+                sc.Deceleration(axis, value);
             }
         }
         public void Acceleration(string[] input)

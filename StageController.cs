@@ -557,7 +557,7 @@ namespace QMProjectTektronix
         public void Acceleration(string axis, int? pos)
         {
             string ascii;
-            Command command;          
+            Command command;
             if (pos is null)
             {
                 //get
@@ -566,53 +566,27 @@ namespace QMProjectTektronix
             else
             {
                 //set
-                ascii = $"{Axis(axis)} s r0xcc {pos}";
-                
+                ascii = $"{Axis(axis)} s r0xcc {pos}";          
             }
             command = new Command(ascii);
             _conn.AddCommand(command);
         }
-        public async Task<int> Deceleration(string axis, int? pos)
+        public void Deceleration(string axis, int? pos)
         {
-            string res;
-            int nres;
             string ascii;
             Command command;
             if (pos is null)
             {
                 //get
-                //res = _conn.Write($"{Axis(axis)} g r0xcd");
-                ascii = $"{Axis(axis)} g r0xcd";
-                
+                ascii = $"{Axis(axis)} g r0xcd";               
             }
             else
             {
                 //set
-                //res =_conn.Write($"{Axis(axis)} s r0xcd {pos}");
-                ascii = $"{Axis(axis)} s r0xcd {pos}";
-                
+                ascii = $"{Axis(axis)} s r0xcd {pos}";                
             }
             command = new Command(ascii);
             _conn.AddCommand(command);
-            res = await command.TSC.Task;
-            Int32.TryParse(res.Split()[1], out nres);
-            if (pos == null)
-            {
-                Console.WriteLine("acceleration: " + nres);
-            }        
-            return nres;
-            /*
-            int nres;
-            try
-            {
-                nres = Int32.Parse(res.Split()[1]);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                nres = -1;
-            }
-            return nres;
-            */
         }
 
         public async Task<bool> WaferSensor()

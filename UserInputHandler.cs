@@ -299,11 +299,14 @@ namespace QMProjectTektronix
         }
         public async Task Error(string[] input)
         {
-            try
+            if (input.Length < 2)
+            {
+                Console.WriteLine("no axis given");
+            }
+            else
             {
                 var axis = input[1];
-                //sc.Error(axis);
-                
+
                 int errorNum = await sc.Error(axis);
 
                 Console.WriteLine($"error code: {errorNum}");
@@ -314,11 +317,7 @@ namespace QMProjectTektronix
                     {
                         Console.WriteLine($"{Math.Log10(key) / Math.Log10(2)} : {sc.Errors[key]}");
                     }
-                }            
-            }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("no axis given");
+                }
             }
         }
 

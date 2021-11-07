@@ -524,22 +524,18 @@ namespace QMProjectTektronix
             }
         }
         
-        public async Task<string> Home(string[] input)
-        {
-            string res = "";
+        public void Home(string[] input)
+        {           
             string axis;
             if (input.Length<2)
             {
-                Console.WriteLine("no axis given");
-                res = "no axis given";
+                Console.WriteLine("no axis given");               
             }
             else
             {
                 axis = input[1];
-                res = await sc.HomeAsync(axis);
-            }
-            Console.WriteLine(res);
-            return res;
+                sc.HomeStage(axis);
+            }           
         }      
 
         public async Task<string> MoveAbsolute2(string[] input)

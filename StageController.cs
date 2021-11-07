@@ -141,27 +141,17 @@ namespace QMProjectTektronix
 
         public async Task<int> Error(string axis)
         {
+            //create command
             string ascii = $"{Axis(axis)} g r0xa0";
             Command command = new Command(ascii);
             _conn.AddCommand(command);
-            var errorCode = await command.TSC.Task;
-            //Console.WriteLine("newCheckMoveComplete: " + res);
-            //return res;
-            
-            //string errorCode = _conn.Write($"{Axis(axis)} g r0xa0");
-            //Console.WriteLine("error code:" + errorCode);
-            string[] errorCodeSub = errorCode.Split();
 
-            int errorNum = 0;
-            try
-            {
-                string n = errorCodeSub[1];
-                Int32.TryParse(n, out errorNum);
-            }
-            catch(IndexOutOfRangeException)
-            {
-                Console.WriteLine("IndexOutOfRangeException");
-            }          
+            //get response
+            var errorCode = await command.TSC.Task;
+            
+            //convert and return
+            string[] errorCodeSub = errorCode.Split();
+            Int32.TryParse(errorCodeSub[1], out int errorNum);      
             return errorNum;           
         }
         public async Task JoyStickFast(string axis)
@@ -300,19 +290,7 @@ namespace QMProjectTektronix
             }
         }
  
-        public int Home(string axis)
-        {
-            
-            if (JoyStickDict[axis])
-            {
-                JoyStickOff(axis);
-            }
-            _conn.Write($"{Axis(axis)} t 2");
-            return 0;//Wait(axis);
-        }
-        
-
-        public async Task<string> HomeAsync(string axis)
+        public async Task<string> HomeStage(string axis)
         {
             string ascii;
             Command command;

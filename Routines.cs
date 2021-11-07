@@ -148,7 +148,7 @@ namespace QMProjectTektronix
         {
             while (!Stop)
             {
-                await sc.HomeAsync("y");
+                await sc.HomeStage("y");
                 await sc.CheckMoveComplete("y");
                 await sc.MoveAbsoluteAsync("y", 200000);
                 await sc.CheckMoveComplete("y");

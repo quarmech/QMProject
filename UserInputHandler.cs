@@ -501,26 +501,26 @@ namespace QMProjectTektronix
         }
         public void SetAbsolute(string[] input)
         {
-            try
+            if (input.Length<2)
+            {
+                Console.WriteLine("no axis given");
+            }
+            else
             {
                 var axis = input[1];
                 sc.SetAbsolute(axis);
             }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("no axis given");
-            }
         }
         public void SetRelative(string[] input)
         {
-            try
+            if (input.Length < 2)
+            {
+                Console.WriteLine("no axis given");
+            }
+            else
             {
                 var axis = input[1];
                 sc.SetRelative(axis);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("no axis given");
             }
         }
         

@@ -517,33 +517,24 @@ namespace QMProjectTektronix
             command = new Command(ascii, true, true);
             _conn.AddCommand(command);                
         }
+
         public async Task<int> Position(string axis)
         {
             string ascii;
-            string res;
-            int nres;
             Command command;
-
+            //create command
             ascii = $"{Axis(axis)} g r0x32";
             command = new Command(ascii);
             _conn.AddCommand(command);
-            res = await command.TSC.Task;
-            /*
-            //write
-            string message = $"{Axis(axis)} g r0x32";
-            message += "\n";
-            byte[] bytes = Encoding.ASCII.GetBytes(message);
-            _conn.Write(bytes, false);
-            //read
-            //byte[] resBytes = _conn.ReadBytes();
-            //string res = Encoding.ASCII.GetString(resBytes);
-            string res = _conn.ReadBytes2();
-            */
-             
-            Int32.TryParse(res.Split()[1], out nres);
-            Console.WriteLine("position: " + nres);
-            return nres;    
+
+            //get result
+            string res = await command.TSC.Task;
+            //convert to int
+            Int32.TryParse(res.Split()[1], out int n);
+            
+            return n;
         }
+
         public async Task<string> Velocity(string axis, int? value)
         {
             //Console.WriteLine("in stagecontorls velocity");

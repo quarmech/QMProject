@@ -51,7 +51,7 @@ namespace QMProjectTektronix
             }
             else if (stringComparer.Equals("pos", code))
             {
-                await Position(splitInput);
+                Position(splitInput);
             }
             else if (stringComparer.Equals("dis", code))
             {
@@ -457,23 +457,17 @@ namespace QMProjectTektronix
             Console.WriteLine(res);
             return res;
         }
-        public async Task Position(string[] input)
+        public void Position(string[] input)
         {
-            string res = "";
-            try
+            if (input.Length<2)
+            {
+                Console.WriteLine("no axis given");
+            } 
+            else
             {
                 var axis = input[1];
-                //int n = await sc.Position(axis); // get
-                //sc.Position(axis);
-                sc.Position(axis); // get
-                //res = n.ToString();              
-            }
-            catch (IndexOutOfRangeException)
-            {
-                res = "no axis given";              
-            }
-            //Console.WriteLine("Position: " + res);
-            
+                sc.Position(axis);
+            }       
         }
         public void Distance(string[] input)
         {

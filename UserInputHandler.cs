@@ -563,26 +563,30 @@ namespace QMProjectTektronix
         }
 
         
-        public async Task<string> MoveRelative(string[] input)
+        public async Task MoveRelative(string[] input)
         {
-            string res = "";
             string axis;
             int position;
-            try
+            if (input.Length < 3)
+            {
+                Console.WriteLine("no axis or no position given");
+            }
+            else
             {
                 axis = input[1];
-                position = Int32.Parse(input[2]);
-                //res = await sc.MoveRelativeAsync(axis, position);
-                sc.MoveRelativeAsync(axis, position);
-                //Console.WriteLine($"moving done, current position is : {m}");
-            }
-            catch (IndexOutOfRangeException)
-            {
-                res = "no axis or no position given";              
-            }
-            Console.WriteLine(res);
-            return res;
+                int.TryParse(input[2], out position);
+                try
+                {
+                    await sc.MoveRelativeAsync(axis, position);
+                    Console.WriteLine("moving started");
+                }
+                catch (OperationFailedException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }          
         }
+
         public void MotorOn(string[] input)
         {
             try

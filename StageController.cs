@@ -362,13 +362,9 @@ namespace QMProjectTektronix
 
         public async Task MoveRelativeAsync(string axis, int value)
         {
-          
-            await SetRelative(axis);
+            SetRelative(axis);
             Distance(axis, value);
-            //await MoveAsync(axis);
-            //return "moving done";
-            await MoveAsync(axis);
-            //await CheckMoveComplete(axis);        
+            await MoveAsync(axis);     
         }
 
         public async Task MoveAbsoluteAsync(string axis, int pos)
@@ -398,14 +394,12 @@ namespace QMProjectTektronix
             _conn.AddCommand(command);          
         }
 
-        public async Task<string> SetRelative(string axis)
-        {
-            //_conn.Write($"{Axis(axis)} s r0xc8 256");
+        public void SetRelative(string axis)
+        {   
+            //create command
             string ascii = $"{Axis(axis)} s r0xc8 256";
             Command command = new Command(ascii);
             _conn.AddCommand(command);
-            string res = await command.TSC.Task;
-            return res;
         }
 
         // get fsol status

@@ -59,7 +59,7 @@ namespace QMProjectTektronix
             }
             else if (stringComparer.Equals("vel", code))
             {
-                res = await Velocity(splitInput);
+                Velocity(splitInput);
             }
             else if (stringComparer.Equals("accel", code))
             {
@@ -405,58 +405,27 @@ namespace QMProjectTektronix
                 Console.WriteLine("no axis given");
             }
         }
-        public async Task<string> Velocity2(string[] input)
+        public void Velocity(string[] input)
         {
-            string res = "";
+            string axis;
             if (input.Length==1)
             {
-                res = "no axis given";
+                Console.WriteLine("no axis given");             
             }
             else if(input.Length==2)
             {
-                var axis = input[1];
-                res = await sc.Velocity(axis, null);
-                if (input.Length==3)
-                {
-                    int value;
-                    int.TryParse(input[2], out value);
-                    await sc.Velocity(axis, value);
-                }
-            }
-
-            Console.WriteLine("Velocity: " + res);
-            return res;
-        }
-        public async Task<string> Velocity(string[] input)
-        {
-            //Console.WriteLine("in consoleAPP velocity");
-            string res = "";
-
-            try
-            {
-                var axis = input[1];
-                try
-                {
-                    int pos = Int32.Parse(input[2]);
-                    //int n = await sc.Velocity(axis, pos);  //set
-                    res = await sc.Velocity(axis, pos);
-                    //res = n.ToString();  
-                }
-                catch (IndexOutOfRangeException)
-                {
-                    //int n = await sc.Velocity(axis, null); //get
-                    res = await sc.Velocity(axis, null);
-                    //res = n.ToString();
-                }               
-            }
-            catch (IndexOutOfRangeException)
-            {
-                res = "no axis given";
+                axis = input[1];
+                sc.Velocity(axis, null);
                 
             }
-            Console.WriteLine(res);
-            return res;
+            else if (input.Length == 3)
+            {
+                axis = input[1];
+                int.TryParse(input[2], out int value);
+                sc.Velocity(axis, value);
+            }
         }
+        
         public void Position(string[] input)
         {
             if (input.Length<2)

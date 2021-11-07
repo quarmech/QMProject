@@ -535,60 +535,25 @@ namespace QMProjectTektronix
             return n;
         }
 
-        public async Task<string> Velocity(string axis, int? value)
-        {
-            //Console.WriteLine("in stagecontorls velocity");
-            string res;
-            //int nres;
+        public void Velocity(string axis, int? value)
+        {           
             string ascii;
             Command command;
             if (value is null)
             {
                 //get
-                //_conn.Write(ascii,false);
                 ascii = $"{Axis(axis)} g r0xcb";
-                
-                
-                
-                //res = await _conn.ReadBytes2Async();
-                //Console.WriteLine(res);
             }
             else
             {
                 //set
-                //res = _conn.Write($"{Axis(axis)} s r0xcb {pos}");
                 ascii = $"{Axis(axis)} s r0xcb {value}";
                 
             }
-            command = new Command(ascii);
+            command = new Command(ascii, true, true);
             _conn.AddCommand(command);
-            res = await command.TSC.Task;
-
-            //Int32.TryParse(res.Split()[1], out nres);
-            //if (value == null)
-            //{
-            //    Console.WriteLine("velocity: " + nres);
-            //}
-            return res;
-            /*
-            try
-            {
-                
-                nres = Int32.Parse(res.Split()[1]);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                nres = -1;
-            }
-            catch (FormatException)
-            {
-                nres = -1;
-            }
-            Console.WriteLine("velocity: " + nres);
-            return nres;
-            */
-
         }
+
         public async Task<int> Acceleration(string axis, int? pos)
         {
             string res;

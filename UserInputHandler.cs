@@ -538,43 +538,28 @@ namespace QMProjectTektronix
             }           
         }      
 
-        public async Task<string> MoveAbsolute2(string[] input)
+        public async Task MoveAbsolute(string[] input)
         {
-            string res = "";
             string axis;
             int position;
             if (input.Length<3)
-            {
-                res = "no axis or no position given";
+            {              
+                Console.WriteLine("no axis or no position given");
             }
             else
             {
-                axis = input[1];
-                position = Int32.Parse(input[2]);              
-                sc.MoveAbsoluteAsync(axis, position);
-                res = "moving started";
+                axis = input[1];              
+                int.TryParse(input[2], out position);
+                try
+                {
+                    await sc.MoveAbsoluteAsync(axis, position);
+                    Console.WriteLine("moving started");
+                }
+                catch(OperationFailedException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }  
             }
-            Console.WriteLine(res);
-            return res;
-        }
-        public async Task<string> MoveAbsolute(string[] input)
-        {
-            string res = "";
-            string axis;
-            int position;
-            try
-            {
-                axis = input[1];
-                position = Int32.Parse(input[2]);
-                //res = await sc.MoveAbsoluteAsync(axis, position);
-                sc.MoveAbsoluteAsync(axis, position);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                res = "no axis or no position given";                
-            }
-            Console.WriteLine(res);
-            return res;
         }
 
         

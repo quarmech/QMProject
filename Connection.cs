@@ -84,7 +84,7 @@ namespace QMProjectTektronix
             commandQueue.Add(command);
         }
 
-        //Writes and Reads a Command
+        //Writes, Reads, and Outputs commands
         public async Task ProcessCommand(Command command)
         {          
             string res = "";

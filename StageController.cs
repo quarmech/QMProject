@@ -115,15 +115,17 @@ namespace QMProjectTektronix
 
         public async Task<int> HomeCheck(string axis)
         {
+            //create command
             string ascii = $"{Axis(axis)} g r0xc9";
             Command command = new Command(ascii);
             _conn.AddCommand(command);
+
+            //get result
             var res = await command.TSC.Task;
 
-            string[] splitRes = res.Split();
-            int n;
-            int.TryParse(splitRes[1], out n);
-
+            //convert and return
+            string[] splitRes = res.Split();      
+            int.TryParse(splitRes[1], out int n);
             return n;
            
         }
@@ -290,13 +292,13 @@ namespace QMProjectTektronix
             }
         }
  
-        public async Task<string> HomeStage(string axis)
+        public async Task HomeStage(string axis)
         {
             string ascii;
             Command command;
             if (await IsMoving(axis))
             {
-                return "axis in motion";
+                //return "axis in motion";
                 //Console.WriteLine("axis in motion");
             }
             if (JoyStickDict[axis])
@@ -307,11 +309,7 @@ namespace QMProjectTektronix
             //_conn.Write($"{Axis(axis)} t 2");
             command = new Command(ascii);
             _conn.AddCommand(command);
-            string res = await command.TSC.Task;
-            //Moving = true;
-            //await MoveDoneAsync(axis);
-            //await CheckMoveComplete(axis);
-            return res;
+
         }
 
         public async Task<bool> IsMoving(string axis)
@@ -326,23 +324,6 @@ namespace QMProjectTektronix
             return true;
         }
         
-        public void Move(string axis)
-        {
-            if (JoyStickDict[axis])
-            {
-                JoyStickOff(axis);
-            }
-            
-            string ascii = $"{Axis(axis)} t 1";
-            Command command = new Command(ascii);
-            _conn.AddCommand(command);
-            
-
-            //_conn.Write($"{Axis(axis)} t 1");
-            //return Wait(axis);
-        }
-        
-
         public async Task MoveAsync(string axis)
         {
             string ascii;
@@ -351,6 +332,7 @@ namespace QMProjectTektronix
             {
                 //return "axis in motion";
                 Console.WriteLine("axis in motion");
+                throw new OperationFailedException("axis in motion");             
             }
             if (JoyStickDict[axis])
             {
@@ -359,11 +341,6 @@ namespace QMProjectTektronix
             ascii = $"{Axis(axis)} t 1";
             command = new Command(ascii);
             _conn.AddCommand(command);
-            await command.TSC.Task;
-            //Moving = true;
-            //_conn.Write($"{Axis(axis)} t 1");
-            //int r = await MoveDoneAsync(axis);
-            //return "move command sent";
         }
 
         public void Send(string command)
@@ -371,57 +348,29 @@ namespace QMProjectTektronix
             _conn.AddCommand(new Command(command, true, true));
         }
 
-
         public void Reset()
         {
             //note: settigns go to default (vel,accel,decel,etc... )
-            /*
-            _conn.Write($"0 r", false);
-            _conn.Write($"1 r", false);
-            _conn.Write($"2 r", false);
-            _conn.Write($"3 r", false);
-            Thread.Sleep(1000);
-            */
+            //note2: "0 r" does not get response, so read set to false
+            
             _conn.AddCommand(new Command("0 r", false));
             _conn.AddCommand(new Command("1 r", true));
             _conn.AddCommand(new Command("2 r", true));
             _conn.AddCommand(new Command("3 r", true));
 
         }
-        
-        public void MoveRelative(string axis, int pos)
-        {
-            SetRelative(axis);
-            Distance(axis, pos);           
-            Move(axis);
-            //CheckMoveComplete(axis);
-            //return Wait(axis);
-        }
-        
+
         public async Task MoveRelativeAsync(string axis, int value)
         {
           
             await SetRelative(axis);
-            await Distance(axis, value);
+            Distance(axis, value);
             //await MoveAsync(axis);
             //return "moving done";
             await MoveAsync(axis);
-            //await CheckMoveComplete(axis);
-            
+            //await CheckMoveComplete(axis);        
         }
 
-
-        
-        public void MoveAbsolute(string axis, int value)
-        {
-            SetAbsolute(axis);
-            Distance(axis, value);
-            MoveAsync(axis);
-            //return Wait(axis);
-            
-        }
-        
-        
         public async Task MoveAbsoluteAsync(string axis, int pos)
         {
             //check if homed
@@ -436,23 +385,19 @@ namespace QMProjectTektronix
                 //return;
             }
 
-            await SetAbsolute(axis);
-            await Distance(axis, pos);
+            SetAbsolute(axis);
+            Distance(axis, pos);
             await MoveAsync(axis);
-            
-            //return "moving done";
-
         }
         
-        public async Task<string> SetAbsolute(string axis)
+        public void SetAbsolute(string axis)
         {           
-            //_conn.Write($"{Axis(axis)} s r0xc8 0");
+            //create command
             string ascii = $"{Axis(axis)} s r0xc8 0";
-            Command command = new Command(ascii);
-            _conn.AddCommand(command);
-            string res = await command.TSC.Task;
-            return res;
+            Command command = new Command(ascii, true, true);
+            _conn.AddCommand(command);          
         }
+
         public async Task<string> SetRelative(string axis)
         {
             //_conn.Write($"{Axis(axis)} s r0xc8 256");
@@ -563,47 +508,20 @@ namespace QMProjectTektronix
             return nres;
         }
 
-        public async Task<string> Distance(string axis, int? pos)
+        public void Distance(string axis, int? pos)
         {
-            string res;
-            int nres;
             string ascii;
             Command command;
             if (pos is null)
             {
-                //get
-                //res = _conn.Write($"{Axis(axis)} g r0xca");
-                ascii = $"{Axis(axis)} g r0xca";
-                
+                ascii = $"{Axis(axis)} g r0xca";              
             }
             else
             {
-                //set
-                //res =_conn.Write($"{Axis(axis)} s r0xca {pos}");
-                //Console.WriteLine("res:" + res);
                 ascii = $"{Axis(axis)} s r0xca {pos}";
             }
-            command = new Command(ascii);
-            _conn.AddCommand(command);
-            res = await command.TSC.Task;
-            Int32.TryParse(res.Split()[1], out nres);
-            if (pos == null)
-            {
-                Console.WriteLine("distance: " + nres);
-            }
-            return res;
-            /*
-            try
-            {
-                nres = Int32.Parse(res.Split()[1]);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("Distance: IndexOutOfRangeException");
-                nres = -1;
-            }
-            return nres;
-            */
+            command = new Command(ascii, true, true);
+            _conn.AddCommand(command);                
         }
         public async Task<int> Position(string axis)
         {

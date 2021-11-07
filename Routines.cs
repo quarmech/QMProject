@@ -53,7 +53,7 @@ namespace QMProjectTektronix
                 await ac.CheckUp();
                 Console.WriteLine("ready for wafer");
             }
-            catch (OperationFailedException ex)
+            catch (OperationFailedException)
             {
                 Stop = true;
                 Console.WriteLine("operation failed");

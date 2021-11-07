@@ -471,27 +471,23 @@ namespace QMProjectTektronix
         }
         public void Distance(string[] input)
         {
-            try
+            string axis;           
+            
+            if (input.Length == 1)
             {
-                var axis = input[1];
-                try
-                {
-                    int pos = Int32.Parse(input[2]);
-                    //int res = sc.Distance(axis, pos); //set
-                    sc.Distance(axis, pos);
-
-                }
-                catch
-                {
-                    //int res = sc.Distance(axis, null); //get
-                    sc.Distance(axis, null);
-                    //Print(res);
-                }                                          
+                Console.WriteLine("no axis given");              
             }
-            catch (IndexOutOfRangeException)
+            else if (input.Length == 2)
             {
-                Console.WriteLine("no axis given");
-            }           
+                axis = input[1];
+                sc.Distance(axis, null);
+            } 
+            else if (input.Length == 3)
+            {
+                axis = input[1];
+                int.TryParse(input[2], out int value);
+                sc.Distance(axis, value);
+            }
         }
         public void SetAbsolute(string[] input)
         {

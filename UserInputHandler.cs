@@ -324,28 +324,28 @@ namespace QMProjectTektronix
 
         public void JoyStickFast(string[] input)
         {
-            try
+            if(input.Length < 2)
+            {
+                Console.WriteLine("no axis given");
+            }
+            else
             {
                 var axis = input[1];
                 sc.JoyStickFast(axis);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("no axis given");
             }
         }
 
         
         public void JoyStickSlow(string[] input)
         {
-            try
+            if (input.Length < 2)
+            {
+                Console.WriteLine("no axis given");
+            }
+            else
             {
                 var axis = input[1];
                 sc.JoyStickSlow(axis);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("no axis given");
             }
         }
         public void JoyStickOff(string[] input)

@@ -158,18 +158,15 @@ namespace QMProjectTektronix
         }
         public async Task JoyStickFast(string axis)
         {
-            //_conn.Write($"{Axis(axis)} i r0 32769");
+            //create command
             string ascii = $"{Axis(axis)} i r0 32769";
             Command command = new Command(ascii);
             _conn.AddCommand(command);
+            //get response
             string res = await command.TSC.Task;
             JoyStickDict[axis] = true;
-            //if (axis=="z")
-            //{
-            //start joystick limit check loop
-            JoyStickLimitCheck(axis);
-            
-            //}          
+            //start limit check function
+            JoyStickLimitCheck(axis);          
         }
 
         public async Task JoyStickFast()
@@ -181,11 +178,14 @@ namespace QMProjectTektronix
         }
         public async Task JoyStickSlow(string axis)
         {
+            //create command
             string ascii = $"{Axis(axis)} i r0 32770";
             Command command = new Command(ascii);
             _conn.AddCommand(command);
+            //get response
             string res = await command.TSC.Task;
             JoyStickDict[axis] = true;
+            //start limit check function
             JoyStickLimitCheck(axis);
         }
         public void JoyStickOff(string axis)

@@ -44,8 +44,7 @@ namespace QMProjectTektronix
             string ascii = "RVC";
             Command command = new Command(ascii);
             _conn.AddCommand(command);
-            string res = await command.TSC.Task;
-            Console.WriteLine(res);
+            string res = await command.TSC.Task;           
             if (res=="\n255\r")
             {
                 return true;
@@ -120,12 +119,11 @@ namespace QMProjectTektronix
             }
         }
 
-        public async Task MoveUp()
+        public void MoveUp()
         {
             string ascii = "ZMX";
             Command command = new Command(ascii);
-            _conn.AddCommand(command);
-            string res = await command.TSC.Task;
+            _conn.AddCommand(command);           
         }
 
         public async Task VacuumOn()

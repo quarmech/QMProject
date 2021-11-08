@@ -92,9 +92,6 @@ namespace QMProjectTektronix
 
                 //align wafer
                 await ac.Align();
-                //TODO: check alignment success
-                //wait for align to complete
-                //await Task.Delay(2000);
                 await ac.WaitForAlign();
 
                 Console.WriteLine("wafer aligned");

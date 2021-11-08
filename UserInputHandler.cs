@@ -215,10 +215,12 @@ namespace QMProjectTektronix
             if(await sc.TBreakOn())
             {
                 sc.Fsol(5, "on");
+                Console.WriteLine("TBreak turned off");
             }
             else
             {
                 sc.Fsol(5, "off");
+                Console.WriteLine("TBreak turned on");
             }
         }
 

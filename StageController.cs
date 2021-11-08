@@ -93,6 +93,8 @@ namespace QMProjectTektronix
             JoyStickOff();
             //stop all motors
             Stop();
+            //tbreak on
+            //Fsol(5, "off");
             //close port
             _conn.End();
         }
@@ -142,6 +144,10 @@ namespace QMProjectTektronix
         }
         public async Task JoyStickFast(string axis)
         {
+            if (axis == "t" && (await TBreakOn()))
+            {
+                await Fsol(5, "on");
+            }
             //create command
             string ascii = $"{Axis(axis)} i r0 32769";
             Command command = new Command(ascii);
@@ -162,6 +168,10 @@ namespace QMProjectTektronix
         }
         public async Task JoyStickSlow(string axis)
         {
+            if (axis == "t" && (await TBreakOn()))
+            {
+                await Fsol(5, "on");
+            }
             //create command
             string ascii = $"{Axis(axis)} i r0 32770";
             Command command = new Command(ascii);
@@ -211,7 +221,7 @@ namespace QMProjectTektronix
                     {
                         if (!limitReached)
                         {
-                            Console.WriteLine("limit reached");
+                            Console.WriteLine("warning: limit reached");
                             limitReached = true;
                             JoyStickOff(axis);
                             //wait n seconds turn on joystick
@@ -320,6 +330,10 @@ namespace QMProjectTektronix
             if (JoyStickDict[axis])
             {
                 JoyStickOff(axis);
+            }
+            if (axis == "t" && (await TBreakOn()))
+            {
+                await Fsol(5, "on");
             }
             ascii = $"{Axis(axis)} t 1";
             command = new Command(ascii);

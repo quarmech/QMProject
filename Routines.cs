@@ -54,8 +54,6 @@ namespace QMProjectTektronix
 
         static public async Task AlignWafer(StageController sc, AlignerController ac, int size)
         {
-            //await Task.WhenAll(sc.MoveAbsoluteAsync("x", Positions.PosLimit["x"]), sc.MoveAbsoluteAsync("y", Positions.Center["y"]) );
-            //await Task.Delay(3000);
             try
             {
                 await sc.WaitForWafer();
@@ -63,14 +61,12 @@ namespace QMProjectTektronix
                 //Go to align position
                 await sc.MoveAbsoluteAsync("x", Positions.XAlignLocation);
                 await sc.MoveAbsoluteAsync("y", Positions.YAlignLocations[size]);
-                //await sc.CheckMoveComplete("y");
-                //await Task.WhenAll(sc.MoveAbsoluteAsync("x", Positions.XAlignLocation), sc.MoveAbsoluteAsync("y", Positions.YAlignLocation[size]));
-
+                
                 //ungrip
                 await sc.Fsol(2, "on");
                 await sc.WaitForUngrip();
 
-                //turn off vacuum and check status
+                //turn off vacuum
                 ac.VacuumOff();
                 await ac.WaitVacuumOff();         
 
@@ -82,15 +78,14 @@ namespace QMProjectTektronix
                 await sc.Fsol(1, "on");              
                 await sc.WaitForGrip();          
 
-                //vacuum On and check status
+                //vacuum On
                 await ac.VacuumOn();
                 await ac.WaitVacuumOn();
 
                 //Move up with vacuum
                 await ac.ZVacuumUp();
                 await ac.WaitForUp();
-                //check z status.
-                //check vacuum
+
                 //make sure in correct position
                 await sc.CheckMoveComplete("x");
                 await sc.CheckMoveComplete("y");
@@ -99,8 +94,8 @@ namespace QMProjectTektronix
                 await ac.Align();
                 //TODO: check alignment success
                 //wait for align to complete
-                await Task.Delay(2000);
-                await ac.CheckAlign();
+                //await Task.Delay(2000);
+                await ac.WaitForAlign();
 
                 Console.WriteLine("wafer aligned");
             }

@@ -94,9 +94,11 @@ namespace QMProjectTektronix
             }
         }
 
-        public async Task CheckAlign()
-        {          
-            while (true)
+
+
+        public async Task WaitForAlign()
+        {
+            for (int i = 0; i < 100; i++)
             {
                 //create command
                 string ascii = "ASG";
@@ -107,19 +109,20 @@ namespace QMProjectTektronix
 
                 if (res==null)
                 {
-                    break;
+                    throw new OperationFailedException("could not read align status");
                 }                           
                 if (res == "\nC\r")
                 {
                     Console.WriteLine("align complete");
-                    break;
+                    return;
                 }
                 if (res == "\nF\r")
                 {
-                    Console.WriteLine("align failed");
-                    break;
+                    throw new OperationFailedException("align failed");                   
                 }
+                await Task.Delay(500);
             }
+            throw new OperationFailedException("align timed out");
         }
 
         public void MoveUp()

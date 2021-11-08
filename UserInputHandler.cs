@@ -298,18 +298,17 @@ namespace QMProjectTektronix
 
         public async Task RotateWafer(string[] input)
         {
-            try
-            {
-                var value = input[1];
-                //Int32.TryParse(Split()[1], out int n);
-                await ac.RotateWafer(value);
-            }
-            catch (IndexOutOfRangeException)
+            if (input.Length < 2)
             {
                 Console.WriteLine("no value given");
             }
-
+            else 
+            {
+                var value = input[1];
+                await ac.RotateWafer(value);
+            }
         }
+
         public async Task Error(string[] input)
         {
             if (input.Length < 2)

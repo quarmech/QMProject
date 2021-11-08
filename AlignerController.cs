@@ -52,7 +52,7 @@ namespace QMProjectTektronix
             return false;
         }
 
-        public async Task WaitForMoveDown()
+        public async Task WaitForDown()
         {
             while(true)
             {
@@ -62,28 +62,22 @@ namespace QMProjectTektronix
                 string res = await command.TSC.Task;
                 //int.TryParse(res, out int n);
                 Console.Write("n:" + res);
-                if (res == "\nD\r")                
+                if (res == "\nD\r" || res == null)                
                 {
                     break;
                 }
             }
         }
 
-        public async Task CheckUp()
+        public async Task WaitForUp()
         {
             while (true)
             {
                 string ascii = "ZRS";
                 Command command = new Command(ascii);
                 _conn.AddCommand(command);
-                string res = await command.TSC.Task;
-                if (res == null)
-                {
-                    break;
-                }
-                //int.TryParse(res, out int n);
-                Console.Write("n:" + res);
-                if (res == "\nU\r")
+                string res = await command.TSC.Task;             
+                if (res == "\nU\r" || res == null)
                 {
                     break;
                 }

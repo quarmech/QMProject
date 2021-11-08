@@ -49,8 +49,8 @@ namespace QMProjectTektronix
                 //ungrip
                 await sc.Fsol(2, "on");
 
-                await ac.MoveUp();
-                await ac.CheckUp();
+                ac.MoveUp();
+                await ac.WaitForUp();
                 Console.WriteLine("ready for wafer");
             }
             catch (OperationFailedException)
@@ -88,7 +88,7 @@ namespace QMProjectTektronix
                 }
 
                 //turn off vacuum and check status
-                await ac.VacuumOff();
+                ac.VacuumOff();
                 bool vacuum = await ac.VacuumStatus();
                 if (vacuum)
                 {
@@ -100,7 +100,7 @@ namespace QMProjectTektronix
                 //move wafer down
                 var a = await ac.MoveDown();
                 //wait for chuck to be down
-                await ac.WaitForMoveDown();
+                await ac.WaitForDown();
                 //center wafer (grip)
                 await sc.Fsol(1, "on");
                 await Task.Delay(500);
@@ -123,7 +123,7 @@ namespace QMProjectTektronix
                 await ac.ZVacuumUp();
 
                 //tODO: wait for up
-                await ac.CheckUp();
+                await ac.WaitForUp();
                 //check z status.
                 //check vacuum
                 await ac.WaitVacuumOn();

@@ -45,10 +45,10 @@ namespace QMProjectTektronix
 
                 Console.WriteLine("ready for wafer");
             }
-            catch (OperationFailedException)
+            catch (OperationFailedException ex)
             {
                 Stop = true;
-                Console.WriteLine("routine failed");
+                Console.WriteLine("routine failed:" + ex);
             }
         }
 
@@ -99,10 +99,10 @@ namespace QMProjectTektronix
 
                 Console.WriteLine("wafer aligned");
             }
-            catch (OperationFailedException)
+            catch (OperationFailedException ex)
             {
                 Stop = true;
-                Console.WriteLine("operation failed");
+                Console.WriteLine("operation failed:" + ex);
             }
         }
         

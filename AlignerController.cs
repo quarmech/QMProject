@@ -56,7 +56,7 @@ namespace QMProjectTektronix
 
         public async Task WaitForDown()
         {
-            while(true)
+            for (int i = 0; i < 100; i++)
             {
                 string ascii = "ZRS";
                 Command command = new Command(ascii);
@@ -65,18 +65,20 @@ namespace QMProjectTektronix
                 if (res == "\nD\r")                
                 {
                     Console.WriteLine("Chuck reached up postion");
-                    break;
+                    return;
                 }
                 if (res == null)
                 {
-                    break;
+                    throw new OperationFailedException("could not read z position status");
                 }
+                await Task.Delay(100);
             }
+            throw new OperationFailedException("Moving up timedout");
         }
 
         public async Task WaitForUp()
         {
-            while (true)
+            for (int i = 0; i < 100; i++)
             {
                 string ascii = "ZRS";
                 Command command = new Command(ascii);
@@ -84,14 +86,16 @@ namespace QMProjectTektronix
                 string res = await command.TSC.Task;
                 if (res == null)
                 {
-                    break;
+                    throw new OperationFailedException("could not read z position status");
                 }
                 if (res == "\nU\r")
                 {
                     Console.WriteLine("Chuck reached up postion");
-                    break;
-                } 
+                    return;
+                }
+                await Task.Delay(100);
             }
+            throw new OperationFailedException("Moving up timedout");
         }
 
 

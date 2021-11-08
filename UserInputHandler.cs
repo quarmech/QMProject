@@ -195,6 +195,10 @@ namespace QMProjectTektronix
             {
                 sc.Fsol(2, "on");
             }
+            else if (stringComparer.Equals("tbreak", code))
+            {
+                TBreak();
+            }
             else if (stringComparer.Equals("rotatewafer", code))
             {
                 RotateWafer(splitInput);
@@ -206,7 +210,17 @@ namespace QMProjectTektronix
             return res;
         }
 
-        
+        public async Task TBreak()
+        {
+            if(await sc.TBreakOn())
+            {
+                sc.Fsol(5, "on");
+            }
+            else
+            {
+                sc.Fsol(5, "off");
+            }
+        }
 
         public async Task TBreakStatus()
         {

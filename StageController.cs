@@ -623,9 +623,9 @@ namespace QMProjectTektronix
             int.TryParse(splitRes[1], out int n);
             if ((n & input6_1) == 0)
             {
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
 
         public async Task<bool> GripperOpen()

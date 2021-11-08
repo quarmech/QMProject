@@ -91,7 +91,7 @@ namespace QMProjectTektronix
             Write(command.Ascii,false);
             if (command.Read)
             {
-                res = await Task.Run(() => ReadBytes2());
+                res = await Task.Run(() => ReadBytes());
                 if (command.Display)
                 {
                     Console.WriteLine("response: " + res);
@@ -231,7 +231,7 @@ namespace QMProjectTektronix
             return res;
         }
 
-        public string ReadBytes2()
+        public string ReadBytes()
         {            
             if (Opened==false)
             {

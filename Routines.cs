@@ -34,23 +34,15 @@ namespace QMProjectTektronix
                 await sc.MoveAbsoluteAsync("y", Positions.Center["y"]);
                 await sc.CheckMoveComplete("y");
 
-                //await Task.WhenAll(sc.MoveAbsoluteAsync("x", Positions.PosLimit["x"]), sc.MoveAbsoluteAsync("y", Positions.Center["y"]) );
                 ac.VacuumOff();
-                //if vacuum still on return;
-                bool vacuum = await ac.VacuumStatus();
-                if (vacuum)
-                {
-                    throw new OperationFailedException("vacuum did not shut off");
-                    //Console.WriteLine("vacuum did not shut off");
-                    //Stop = true;
-                    //return;
-                }
+                await ac.WaitVacuumOff();   
 
                 //ungrip
                 await sc.Fsol(2, "on");
 
                 ac.MoveUp();
                 await ac.WaitForUp();
+
                 Console.WriteLine("ready for wafer");
             }
             catch (OperationFailedException)

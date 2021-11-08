@@ -127,11 +127,12 @@ namespace QMProjectTektronix
             }
             else if (stringComparer.Equals("read", code))
             {
-                sc._conn.ReadBytes2();
+                sc._conn.ReadBytes();
+                Console.WriteLine(res);
             }
             else if (stringComparer.Equals("aread", code))
             {
-                res = ac._conn.ReadBytes2();
+                res = ac._conn.ReadBytes();
                 Console.WriteLine(res);
             }
             else if (stringComparer.Equals("aclear", code))

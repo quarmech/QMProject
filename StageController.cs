@@ -481,7 +481,7 @@ namespace QMProjectTektronix
             ascii = $"{Axis(axis)} g r0x32";
             command = new Command(ascii, true, false);
             _conn.AddCommand(command);
-
+            
             //get result
             string res = await command.TSC.Task;
             //convert to int

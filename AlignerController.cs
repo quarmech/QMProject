@@ -148,10 +148,26 @@ namespace QMProjectTektronix
 
                 if (status)
                 {
-                    break;
+                    return;
                 }
                     
             }
+            throw new OperationFailedException("failed: vacuum did not turn on");
+        }
+        public async Task WaitVacuumOff()
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                await Task.Delay(500);
+                bool status = await VacuumStatus();
+
+                if (!status)
+                {
+                    return;
+                }
+
+            }
+            throw new OperationFailedException("failed: vacuum did not turn off");
         }
 
         public async Task ZVacuumUp()

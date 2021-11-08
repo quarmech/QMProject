@@ -406,35 +406,15 @@ namespace QMProjectTektronix
             string ascii = $"{axis} g r0xab";
             Command command = new Command(ascii);
             _conn.AddCommand(command);
-            string res = await command.TSC.Task;
-            int n;              
-            int.TryParse(res.Split()[1], out n);
+            string res = await command.TSC.Task;                 
+            int.TryParse(res.Split()[1], out int n);
             Console.WriteLine("Fsol: " + n);
             return n;
-
-            //string res = _conn.Write($"{axis} g r0xab");
-            /*
-            int n;
-            try
-            {
-                n = Int32.Parse(res.Split()[1]);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                n = -1;
-            }
-            catch (FormatException)
-            {
-                n = -1;
-            }
-            return n;           
-            */
         }
 
         //Set Fsol
         public async Task<int> Fsol(int number, string status)
         {
-
             int axis = 0;
             int bit = 0;
 
@@ -468,20 +448,10 @@ namespace QMProjectTektronix
             Command command = new Command(ascii);
             _conn.AddCommand(command);
             string res = await command.TSC.Task;
-            //string res = _conn.Write($"{axis} s r0xab {bit}");
-            int nres;
-            try
-            {
-                nres = Int32.Parse(res.Split()[1]);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                nres = -1;
-            }
-            catch (FormatException)
-            {
-                nres = -1;
-            }
+            
+           
+            int.TryParse(res, out int nres);
+
             return nres;
         }
 

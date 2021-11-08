@@ -598,11 +598,6 @@ namespace QMProjectTektronix
             }
         }
 
-        /*
-         * Aligner
-         * 
-         */
-
         public async Task VacuumStatus()
         {
             bool status = await ac.VacuumStatus();

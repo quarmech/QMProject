@@ -35,7 +35,7 @@ namespace QMProjectTektronix
                 await sc.CheckMoveComplete("y");
 
                 //await Task.WhenAll(sc.MoveAbsoluteAsync("x", Positions.PosLimit["x"]), sc.MoveAbsoluteAsync("y", Positions.Center["y"]) );
-                await ac.VacuumOff();
+                ac.VacuumOff();
                 //if vacuum still on return;
                 bool vacuum = await ac.VacuumStatus();
                 if (vacuum)

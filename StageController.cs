@@ -375,9 +375,9 @@ namespace QMProjectTektronix
             {
                 //await HomeAsync(axis);
                 //await CheckMoveComplete(axis);
-                Console.WriteLine("axis not homed");
+                Console.WriteLine($"{axis} axis not homed");
                 //throw new Exception("not homed");
-                throw new OperationFailedException("axis not homed");
+                throw new OperationFailedException($"{axis} axis not homed");
                 //return;
             }
 

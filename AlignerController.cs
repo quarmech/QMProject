@@ -136,12 +136,11 @@ namespace QMProjectTektronix
             string res = await command.TSC.Task;
         }
 
-        public async Task VacuumOff()
+        public void VacuumOff()
         {
             string ascii = "VAC0";
             Command command = new Command(ascii);
-            _conn.AddCommand(command);
-            string res = await command.TSC.Task;
+            _conn.AddCommand(command);          
         }
 
         public async Task WaitVacuumOn()

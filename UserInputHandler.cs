@@ -553,26 +553,26 @@ namespace QMProjectTektronix
 
         public void MotorOn(string[] input)
         {
-            try
+            if (input.Length < 2)
+            {
+                Console.WriteLine("no axis given");
+            }
+            else
             {
                 var axis = input[1];
                 sc.MotorOn(axis);
             }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("no axis given");
-            }
         }
         public void MotorOff(string[] input)
         {
-            try
+            if (input.Length < 2)
+            {
+                Console.WriteLine("no axis given");
+            }
+            else
             {
                 var axis = input[1];
                 sc.MotorOff(axis);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("no axis given");
             }
         }
 

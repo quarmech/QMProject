@@ -384,19 +384,6 @@ namespace QMProjectTektronix
 
         public async Task<bool> CheckMoveComplete(string axis)
         {
-            //Command errorCommand = Error(axis);
-            //that returns command object
-            //run a loop to wait for commmand.Data to be updated?
-            //do logic
-            //var code = await errorCommand.TSC.Task;
-            /*
-            while(errorCommand.Data==null)
-            {
-
-            }
-            */
-            //Console.WriteLine("newCheckMoveComplete: " + code);
-
             int errorCode;
             int currentPos;
             int? prevPos = null;
@@ -408,6 +395,7 @@ namespace QMProjectTektronix
                 if (((errorCode & bit27) != bit27))
                 {
                     //Moving = false;
+                    Console.WriteLine($"moveing {axis} done");
                     return false;
                 }
                 currentPos = await Position(axis);
@@ -418,6 +406,7 @@ namespace QMProjectTektronix
                 if (repeatCount>5)
                 {
                     //Moving = false;
+                    Console.WriteLine($"stuck moveing {axis}");
                     return false;
                 }
                 prevPos = currentPos;

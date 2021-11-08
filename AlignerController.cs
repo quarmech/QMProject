@@ -45,11 +45,13 @@ namespace QMProjectTektronix
             Command command = new Command(ascii);
             _conn.AddCommand(command);
             string res = await command.TSC.Task;
-            Console.WriteLine(res);
+            
             if (res=="\n255\r")
             {
+                Console.WriteLine("vacuum is on");
                 return true;
             }
+            Console.WriteLine("vacuum is off");
             return false;
         }
 
@@ -70,7 +72,7 @@ namespace QMProjectTektronix
             }
         }
 
-        public async Task CheckUp()
+        public async Task WaitForChuckUp()
         {
             while (true)
             {
@@ -83,11 +85,12 @@ namespace QMProjectTektronix
                     break;
                 }
                 //int.TryParse(res, out int n);
-                Console.Write("n:" + res);
+                //Console.Write("n:" + res);
                 if (res == "\nU\r")
                 {
                     break;
                 }
+                Console.WriteLine("chuck is in up position");
             }
         }
 

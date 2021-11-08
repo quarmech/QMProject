@@ -50,7 +50,7 @@ namespace QMProjectTektronix
                 await sc.Fsol(2, "on");
 
                 await ac.MoveUp();
-                await ac.CheckUp();
+                await ac.WaitForChuckUp();
                 Console.WriteLine("ready for wafer");
             }
             catch (OperationFailedException ex)
@@ -123,7 +123,7 @@ namespace QMProjectTektronix
                 await ac.ZVacuumUp();
 
                 //tODO: wait for up
-                await ac.CheckUp();
+                await ac.WaitForChuckUp();
                 //check z status.
                 //check vacuum
                 await ac.WaitVacuumOn();

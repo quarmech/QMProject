@@ -24,7 +24,7 @@ Reset all Amplifiers: reset
 
 Home an axis: home <axis>
 
-Move by Absolute: moveAbs <axis> <value>
+Move by Absolute: moveabs <axis> <value>
 
 Move by Relative: moverel <axis> <value>
 
@@ -47,10 +47,14 @@ Turn off joystick: joyoff <axis>
 Read Error codes: error <axis>
 
 Turn on motor: on <axis>
+  
 Turn off motor: off <axis>
 
 Run routine Align 300mm: alignwafer300
+  
 Run routine Align 200mm: alignwafer200
+  
 Run routine Align 150mm: alignwafer150
+  
 Run routine go to wafer pick position: pickupwafer
 

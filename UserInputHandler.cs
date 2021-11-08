@@ -27,23 +27,19 @@ namespace QMProjectTektronix
 
             if (stringComparer.Equals("quit", code))
             {
-                Quit();              
+                Quit();
             }
             else if (stringComparer.Equals("home", code))
             {
-                res = await Home2(splitInput);
-            }
-            else if (stringComparer.Equals("move", code))
-            {
-                Move(splitInput);
+                Home(splitInput);
             }
             else if (stringComparer.Equals("moveAbs", code))
             {
-                res = await MoveAbsolute(splitInput);
+                MoveAbsolute(splitInput);
             }
             else if (stringComparer.Equals("moveRel", code))
             {
-                res = await MoveRelative(splitInput);
+                MoveRelative(splitInput);
             }
             else if (stringComparer.Equals("setAbs", code))
             {
@@ -89,25 +85,9 @@ namespace QMProjectTektronix
             {
                 JoyStickOff(splitInput);
             }
-            else if (stringComparer.Equals("sequence1", code))
+            else if (stringComparer.Equals("routine1", code))
             {
-                Routines.Sequence1(sc, ac);
-            }
-            else if (stringComparer.Equals("sequence2", code))
-            {
-                Routines.Sequence2(sc, ac);
-            }
-            else if (stringComparer.Equals("sequence3", code))
-            {
-                Routines.Sequence3(sc, ac);
-            }
-            else if (stringComparer.Equals("sequence4", code))
-            {
-                Routines.Sequence4(sc, ac);
-            }
-            else if (stringComparer.Equals("sequence5", code))
-            {
-                Routines.Sequence5(sc, ac);
+                Routines.Routine1(sc, ac);
             }
             else if (stringComparer.Equals("alignwafer300", code))
             {
@@ -154,17 +134,13 @@ namespace QMProjectTektronix
                 res = ac._conn.ReadBytes2();
                 Console.WriteLine(res);
             }
-            else if (stringComparer.Equals("vl", code))
-            {
-                AlignerConfig();
-            }
             else if (stringComparer.Equals("aclear", code))
             {
                 AlignerClear();
             }
             else if (stringComparer.Equals("a", code))
             {
-                Command(splitInput);
+                AlignerCommand(splitInput);
             }
             else if (stringComparer.Equals("joyonall", code))
             {
@@ -184,7 +160,7 @@ namespace QMProjectTektronix
             }
             else if (stringComparer.Equals("poslimit", code))
             {
-                //PositiveLimit(splitInput);
+                PositiveLimit(splitInput);
             }
             else if (stringComparer.Equals("vacuumOn", code))
             {
@@ -225,39 +201,11 @@ namespace QMProjectTektronix
             else
             {
                 sc.Send(command);
-                //res = sc._conn.Write(command, false);
-                //Console.WriteLine(res);
             }
             return res;
         }
 
-        public async Task VacuumStatus()
-        {
-            bool status = await ac.VacuumStatus();
-            //bool close = await sc.GripperClosed();
-            if (status)
-            {
-                Console.WriteLine("vacuum is on");
-            }
-            else
-            {
-                Console.WriteLine("vacuum is off");
-            }
-        }
-
-        public async Task WaferStatus()
-        {
-            bool status = await sc.WaferSensor();
-            //bool close = await sc.GripperClosed();
-            if (status)
-            {
-                Console.WriteLine("wafer is sensed");
-            }
-            else
-            {
-                Console.WriteLine("no wafer");
-            }
-        }
+        
 
         public async Task TBreakStatus()
         {
@@ -288,28 +236,38 @@ namespace QMProjectTektronix
         }
         public async Task Center(string[] input)
         {
-            var axis = input[1];
-            
-            sc.MoveAbsoluteAsync(axis, Positions.Center[axis]);
-      
-        }
-        /*
-        public async Task<bool> Homed(string axis)
-        {
-            int res = await sc.Homed(axis);
-            int bit12 = 4096;
-            if ((res & bit12)==bit12)
+            string axis;
+            if (input.Length < 2)
             {
-                return true;
+                Console.WriteLine("no axis given");
             }
-            return false;
+            else
+            {               
+                axis = input[1];
+                await sc.MoveAbsoluteAsync(axis, Positions.Center[axis]);
+            }            
         }
-        */
+
+        public async Task PositiveLimit(string[] input)
+        {
+            string axis;
+            if (input.Length < 2)
+            {
+                Console.WriteLine("no axis given");
+            }
+            else
+            {
+                axis = input[1];
+                await sc.MoveAbsoluteAsync(axis, Positions.PosLimit[axis]);
+            }
+        }
+        
+
         public async Task Quit()
         {         
             //await sc.End();
             //await ac.End();
-            //Console.WriteLine("testing in Quit()");
+          
             Program.End = true;
         }
         public void Stop()
@@ -568,25 +526,14 @@ namespace QMProjectTektronix
                 Console.WriteLine("no axis given");
             }
         }
-        public void Move(string[] input)
-        {
-            string axis;
-            try
-            {
-                axis = input[1];
-                sc.Move(axis);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("no axis given");
-            }
-        }
-        public async Task<string> Home2(string[] input)
+        
+        public async Task<string> Home(string[] input)
         {
             string res = "";
             string axis;
             if (input.Length<2)
             {
+                Console.WriteLine("no axis given");
                 res = "no axis given";
             }
             else
@@ -596,25 +543,7 @@ namespace QMProjectTektronix
             }
             Console.WriteLine(res);
             return res;
-        }
-        public async Task<string> Home(string[] input)
-        {
-            string res = "";
-            string axis;
-            try
-            {
-                axis = input[1];
-                await sc.HomeAsync(axis);
-                //Console.WriteLine($"homeing complete, current position: {res}");                
-            }
-            catch
-            {
-                res = "no axis given";
-                //Console.WriteLine("no axis given");
-            }
-            Console.WriteLine(res);
-            return res;
-        }
+        }      
 
         public async Task<string> MoveAbsolute2(string[] input)
         {
@@ -628,8 +557,7 @@ namespace QMProjectTektronix
             else
             {
                 axis = input[1];
-                position = Int32.Parse(input[2]);
-                //res = await sc.MoveAbsoluteAsync(axis, position);
+                position = Int32.Parse(input[2]);              
                 sc.MoveAbsoluteAsync(axis, position);
                 res = "moving started";
             }
@@ -729,12 +657,40 @@ namespace QMProjectTektronix
          * 
          */
 
+        public async Task VacuumStatus()
+        {
+            bool status = await ac.VacuumStatus();
+            //bool close = await sc.GripperClosed();
+            if (status)
+            {
+                Console.WriteLine("vacuum is on");
+            }
+            else
+            {
+                Console.WriteLine("vacuum is off");
+            }
+        }
+
+        public async Task WaferStatus()
+        {
+            bool status = await sc.WaferSensor();
+            //bool close = await sc.GripperClosed();
+            if (status)
+            {
+                Console.WriteLine("wafer is sensed");
+            }
+            else
+            {
+                Console.WriteLine("no wafer");
+            }
+        }
+
         public void AlignerClear()
         {
             ac.Clear();
         }
 
-        public void Command(string[] input)
+        public void AlignerCommand(string[] input)
         {
             //string res = ac.Command(String.Join(" ",input.Skip(1)));
             ac.Command(String.Join(" ", input.Skip(1)));
@@ -743,23 +699,6 @@ namespace QMProjectTektronix
         public void AlignerConfig()
         {
             ac.Config();          
-        }
-
-        public void Vaccume()
-        {
-
-        }
-        public void Grip()
-        {
-
-        }
-        public void UnGrip()
-        {
-
-        }
-        public void Align()
-        {
-
         }
 
         public int Axis(string a)
@@ -778,8 +717,5 @@ namespace QMProjectTektronix
                     return -1;
             }
         }
-
     }
-    
-
 }

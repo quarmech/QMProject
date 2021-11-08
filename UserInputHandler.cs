@@ -107,7 +107,7 @@ namespace QMProjectTektronix
             }
             else if (stringComparer.Equals("pickupandalign", code))
             {
-                await Routines.PickUpWaferAndAlign(sc, ac, 300);
+                await Routines.PickUpWaferAndAlignCycle(sc, ac, 300);
             }
             else if (stringComparer.Equals("error", code))
             {
@@ -223,8 +223,7 @@ namespace QMProjectTektronix
 
         public async Task GripStatus()
         {
-            bool open = await sc.GripperOpen();
-            //bool close = await sc.GripperClosed();
+            bool open = await sc.GripperOpen();           
             if (open)
             {
                 Console.WriteLine("gripper opened");
@@ -244,7 +243,15 @@ namespace QMProjectTektronix
             else
             {               
                 axis = input[1];
-                await sc.MoveAbsoluteAsync(axis, Positions.Center[axis]);
+                try
+                {
+                    await sc.MoveAbsoluteAsync(axis, Positions.Center[axis]);
+                }
+                catch (OperationFailedException)
+                {
+                    
+                }
+                
             }            
         }
 
@@ -258,11 +265,17 @@ namespace QMProjectTektronix
             else
             {
                 axis = input[1];
-                await sc.MoveAbsoluteAsync(axis, Positions.PosLimit[axis]);
+                try
+                {
+                    await sc.MoveAbsoluteAsync(axis, Positions.PosLimit[axis]);
+                }
+                catch (OperationFailedException)
+                {
+                    
+                }
             }
         }
         
-
         public void Quit()
         {                
             Program.End = true;

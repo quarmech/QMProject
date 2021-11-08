@@ -13,8 +13,6 @@ namespace QMProjectTektronix
         public IDictionary<int, string> Errors { get; private set; }
         public IDictionary<string, bool> JoyStickDict { get; private set; }
 
-        //public IDictionary<string, bool> MovingDict { get; private set; }
-
         public StageController(Connection comm)
         {
             Console.WriteLine("initializing stage controls...");
@@ -22,8 +20,7 @@ namespace QMProjectTektronix
             {
                 _conn = comm;
                 AddErrorBits();
-                //SetupAxis();
-                SetupJoystick();              
+                SetupJoystick();           
             } 
             catch 
             {
@@ -40,17 +37,7 @@ namespace QMProjectTektronix
             MotorOn("y");
             MotorOn("z");
             MotorOn("t");   
-            
-            //_conn.Write("0 s r0xab 1", true);
-            //_conn.Write("1 s r0xab 1", true);
-            //_conn.Write("2 s r0xab 1", true);
-            //_conn.Write("3 s r0xab 1", true);
-            /*
-            _conn.Write("0 s r0x24 21", true);
-            _conn.Write("1 s r0x24 21", true);
-            _conn.Write("2 s r0x24 21", true);
-            _conn.Write("3 s r0x24 21", true);
-            */
+
             //set to position loop control          
             _conn.AddCommand(new Command("0 s r0x24 21", true, false));
             _conn.AddCommand(new Command("0 s r0x24 21", true, false));
@@ -74,12 +61,9 @@ namespace QMProjectTektronix
             Deceleration("x", 200000);
             Deceleration("y", 200000);
             Deceleration("z", 200000);
-            Deceleration("t", 200000);
-            
+            Deceleration("t", 200000);          
         }
 
-
-        
         public void MotorOn(string axis)
         {
             _conn.AddCommand(new Command($"{Axis(axis)} s r0xab 1", true, false));        
@@ -237,15 +221,14 @@ namespace QMProjectTektronix
                     else
                     {
                         limitReached = false;
-                    }
-                    //await Task.Delay(50);
+                    }                  
                 }
             }
         }
 
         public async Task JoyStickDelayedOn(string axis)
         {
-            await Task.Delay(2000);
+            await Task.Delay(4000);
             await JoyStickFast(axis);
         }
 

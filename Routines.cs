@@ -11,7 +11,7 @@ namespace QMProjectTektronix
         static public bool Stop { get; set; } = false;
 
         static Routines(){}
-        static public async Task PickUpWaferAndAlign(StageController sc, AlignerController ac, int size)
+        static public async Task PickUpWaferAndAlignCycle(StageController sc, AlignerController ac, int size)
         {
             int count = 0;
             Stop = false;
@@ -56,7 +56,7 @@ namespace QMProjectTektronix
             catch (OperationFailedException)
             {
                 Stop = true;
-                Console.WriteLine("operation failed");
+                Console.WriteLine("routine failed");
             }
         }
 
@@ -87,6 +87,7 @@ namespace QMProjectTektronix
 
                 //turn off vacuum and check status
                 ac.VacuumOff();
+                await Task.Delay(100);
                 bool vacuum = await ac.VacuumStatus();
                 if (vacuum)
                 {
@@ -116,7 +117,7 @@ namespace QMProjectTektronix
                 //Move up with vacuum
                 await ac.ZVacuumUp();
 
-                //tODO: wait for up
+                //wait for up
                 await ac.WaitForUp();
                 //check z status.
                 //check vacuum

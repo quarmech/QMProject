@@ -143,7 +143,7 @@ namespace QMProjectTektronix
         {
             for(int i=0; i<100; i++)
             {
-                await Task.Delay(1000);
+                await Task.Delay(500);
                 bool status = await VacuumStatus();
 
                 if (status)

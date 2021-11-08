@@ -300,7 +300,7 @@ namespace QMProjectTektronix
         {
             while(commandQueue.Count>0)
             {
-                Console.WriteLine("clearing command queue");
+                Thread.Sleep(100);
             }
             commandQueue.CompleteAdding();
             Opened = false;

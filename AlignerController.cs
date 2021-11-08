@@ -47,8 +47,10 @@ namespace QMProjectTektronix
             string res = await command.TSC.Task;           
             if (res=="\n255\r")
             {
+                Console.WriteLine("vacuum status: on");
                 return true;
             }
+            Console.WriteLine("vacuum status: off");
             return false;
         }
 
@@ -60,8 +62,6 @@ namespace QMProjectTektronix
                 Command command = new Command(ascii);
                 _conn.AddCommand(command);
                 string res = await command.TSC.Task;
-                //int.TryParse(res, out int n);
-                Console.Write("n:" + res);
                 if (res == "\nD\r" || res == null)                
                 {
                     break;
@@ -76,11 +76,16 @@ namespace QMProjectTektronix
                 string ascii = "ZRS";
                 Command command = new Command(ascii);
                 _conn.AddCommand(command);
-                string res = await command.TSC.Task;             
-                if (res == "\nU\r" || res == null)
+                string res = await command.TSC.Task;
+                if (res == null)
                 {
                     break;
                 }
+                if (res == "\nU\r")
+                {
+                    Console.WriteLine("Chuck reached up postion");
+                    break;
+                } 
             }
         }
 
@@ -88,18 +93,17 @@ namespace QMProjectTektronix
         {          
             while (true)
             {
+                //create command
                 string ascii = "ASG";
                 Command command = new Command(ascii);
                 _conn.AddCommand(command);
-          
+                //get response
                 string res = await command.TSC.Task;
+
                 if (res==null)
                 {
                     break;
-                }
-  
-                //int.TryParse(res, out int n);
-                Console.Write("n:" + res);
+                }                           
                 if (res == "\nC\r")
                 {
                     Console.WriteLine("align complete");

@@ -76,15 +76,13 @@ namespace QMProjectTektronix
 
                 //ungrip
                 await sc.Fsol(2, "on");
-                //TODO: check if delay enought
+                //TODO: check if delay enough
                 await Task.Delay(100);
                 //check gripper status via presence sensor
                 bool isClosed = await sc.GripperClosed();
                 if (isClosed)
                 {
-                    Console.WriteLine("gripper did not open");
-                    Stop = true;
-                    return;
+                    throw new OperationFailedException("gripper did not open");
                 }
 
                 //turn off vacuum and check status
@@ -92,9 +90,7 @@ namespace QMProjectTektronix
                 bool vacuum = await ac.VacuumStatus();
                 if (vacuum)
                 {
-                    Console.WriteLine("vacuum did not shut off");
-                    Stop = true;
-                    return;
+                    throw new OperationFailedException("vacuum did not shut off");
                 }
 
                 //move wafer down
@@ -108,9 +104,7 @@ namespace QMProjectTektronix
                 bool open = await sc.GripperOpen();
                 if (open)
                 {
-                    Console.WriteLine("gripper did not close");
-                    Stop = true;
-                    return;
+                    throw new OperationFailedException("gripper did not close");
                 }
                 //delay
                 //await Task.Delay(2000);

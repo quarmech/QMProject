@@ -82,7 +82,7 @@ namespace QMProjectTektronix
         
         public void MotorOn(string axis)
         {
-            _conn.AddCommand(new Command($"{Axis(axis)} s r0xab 1", true, false));          
+            _conn.AddCommand(new Command($"{Axis(axis)} s r0xab 1", true, false));        
         }
         public void MotorOff(string axis)
         {          
@@ -185,8 +185,8 @@ namespace QMProjectTektronix
             //get response
             string res = await command.TSC.Task;
             JoyStickDict[axis] = true;
-            //start limit check function
-            JoyStickLimitCheck(axis);
+            //start limit check function          
+            JoyStickLimitCheck(axis);                  
         }
         public void JoyStickOff(string axis)
         {
@@ -238,7 +238,7 @@ namespace QMProjectTektronix
                     {
                         limitReached = false;
                     }
-                    await Task.Delay(50);
+                    //await Task.Delay(50);
                 }
             }
         }
@@ -390,7 +390,7 @@ namespace QMProjectTektronix
         {           
             //create command
             string ascii = $"{Axis(axis)} s r0xc8 0";
-            Command command = new Command(ascii, true, true);
+            Command command = new Command(ascii, true, false);
             _conn.AddCommand(command);          
         }
 
@@ -508,13 +508,15 @@ namespace QMProjectTektronix
             Command command;
             if (pos is null)
             {
-                ascii = $"{Axis(axis)} g r0xca";              
+                ascii = $"{Axis(axis)} g r0xca";
+                command = new Command(ascii, true, true);
             }
             else
             {
                 ascii = $"{Axis(axis)} s r0xca {pos}";
+                command = new Command(ascii, true, false);
             }
-            command = new Command(ascii, true, true);
+            
             _conn.AddCommand(command);                
         }
 
@@ -524,7 +526,7 @@ namespace QMProjectTektronix
             Command command;
             //create command
             ascii = $"{Axis(axis)} g r0x32";
-            command = new Command(ascii);
+            command = new Command(ascii, true, true);
             _conn.AddCommand(command);
 
             //get result
@@ -543,14 +545,15 @@ namespace QMProjectTektronix
             {
                 //get
                 ascii = $"{Axis(axis)} g r0xcb";
+                command = new Command(ascii, true, true);
             }
             else
             {
                 //set
                 ascii = $"{Axis(axis)} s r0xcb {value}";
-                
-            }
-            command = new Command(ascii, true, true);
+                command = new Command(ascii, true, false);
+
+            }            
             _conn.AddCommand(command);
         }
 
@@ -561,14 +564,16 @@ namespace QMProjectTektronix
             if (pos is null)
             {
                 //get
-                ascii = $"{Axis(axis)} g r0xcc";              
+                ascii = $"{Axis(axis)} g r0xcc";
+                command = new Command(ascii, true, true);
             }
             else
             {
                 //set
-                ascii = $"{Axis(axis)} s r0xcc {pos}";          
+                ascii = $"{Axis(axis)} s r0xcc {pos}";
+                command = new Command(ascii, true, false);
             }
-            command = new Command(ascii);
+            
             _conn.AddCommand(command);
         }
         public void Deceleration(string axis, int? pos)
@@ -578,14 +583,15 @@ namespace QMProjectTektronix
             if (pos is null)
             {
                 //get
-                ascii = $"{Axis(axis)} g r0xcd";               
+                ascii = $"{Axis(axis)} g r0xcd";
+                command = new Command(ascii, true, true);
             }
             else
             {
                 //set
-                ascii = $"{Axis(axis)} s r0xcd {pos}";                
-            }
-            command = new Command(ascii);
+                ascii = $"{Axis(axis)} s r0xcd {pos}";
+                command = new Command(ascii, true, false);
+            }          
             _conn.AddCommand(command);
         }
 
@@ -617,6 +623,7 @@ namespace QMProjectTektronix
 
                 if (status)
                 {
+                    Console.WriteLine("wafer detected");
                     return;
                 }
                 await Task.Delay(1000);
@@ -654,8 +661,10 @@ namespace QMProjectTektronix
             int.TryParse(splitRes[1], out int n);                     
             if ((n & input8_3) == 0)
             {
+                Console.WriteLine("grip status: open");
                 return true;
             }
+            Console.WriteLine("grip status: closed");
             return false;
         }
 
@@ -671,8 +680,10 @@ namespace QMProjectTektronix
             
             if ((n & input7_2) == 0)
             {
+                Console.WriteLine("grip status: closed");
                 return true;
             }
+            Console.WriteLine("grip status: open");
             return false;
         }
 

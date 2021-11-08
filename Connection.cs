@@ -75,7 +75,7 @@ namespace QMProjectTektronix
             foreach (var command in commandQueue.GetConsumingEnumerable())
             {                               
                 await ProcessCommand(command);
-                await Task.Delay(100);
+                //await Task.Delay(100);
             }                   
         }
         
@@ -298,6 +298,10 @@ namespace QMProjectTektronix
 
         public void End()
         {
+            while(commandQueue.Count>0)
+            {
+                Console.WriteLine("clearing command queue");
+            }
             commandQueue.CompleteAdding();
             Opened = false;
             base.Close();

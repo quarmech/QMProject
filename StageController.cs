@@ -22,7 +22,7 @@ namespace QMProjectTektronix
                 AddErrorBits();
                 SetupJoystick();           
             } 
-            catch 
+            catch
             {
                 Console.WriteLine("Error: Could not connect to Stages");
             }
@@ -479,13 +479,15 @@ namespace QMProjectTektronix
             Command command;
             //create command
             ascii = $"{Axis(axis)} g r0x32";
-            command = new Command(ascii, true, true);
+            command = new Command(ascii, true, false);
             _conn.AddCommand(command);
 
             //get result
             string res = await command.TSC.Task;
             //convert to int
             Int32.TryParse(res.Split()[1], out int n);
+            //output
+            Console.WriteLine($"Position: {n}");
             
             return n;
         }

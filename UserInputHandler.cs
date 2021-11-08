@@ -600,16 +600,7 @@ namespace QMProjectTektronix
 
         public async Task VacuumStatus()
         {
-            bool status = await ac.VacuumStatus();
-            //bool close = await sc.GripperClosed();
-            if (status)
-            {
-                Console.WriteLine("vacuum is on");
-            }
-            else
-            {
-                Console.WriteLine("vacuum is off");
-            }
+            await ac.VacuumStatus();
         }
 
         public async Task WaferStatus()

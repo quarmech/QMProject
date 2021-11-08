@@ -29,9 +29,9 @@ namespace QMProjectTektronix
             try
             {
                 //pick up wafer
-                await sc.MoveAbsoluteAsync("x", Positions.XAlignLocation);
-                //await sc.CheckMoveComplete("x");
+                await sc.MoveAbsoluteAsync("x", Positions.XAlignLocation);               
                 await sc.MoveAbsoluteAsync("y", Positions.Center["y"]);
+                await sc.CheckMoveComplete("x");
                 await sc.CheckMoveComplete("y");
 
                 ac.VacuumOff();
@@ -68,53 +68,33 @@ namespace QMProjectTektronix
 
                 //ungrip
                 await sc.Fsol(2, "on");
-                //TODO: check if delay enough
-                await Task.Delay(100);
-                //check gripper status via presence sensor
-                bool isClosed = await sc.GripperClosed();
-                if (isClosed)
-                {
-                    throw new OperationFailedException("gripper did not open");
-                }
+                await sc.WaitForUngrip();
 
                 //turn off vacuum and check status
                 ac.VacuumOff();
-                await Task.Delay(100);
-                bool vacuum = await ac.VacuumStatus();
-                if (vacuum)
-                {
-                    throw new OperationFailedException("vacuum did not shut off");
-                }
+                await ac.WaitVacuumOff();         
 
                 //move wafer down
-                var a = await ac.MoveDown();
-                //wait for chuck to be down
+                var a = await ac.MoveDown();              
                 await ac.WaitForDown();
+
                 //center wafer (grip)
-                await sc.Fsol(1, "on");
-                await Task.Delay(500);
-                //TODO: check grip status
-                bool open = await sc.GripperOpen();
-                if (open)
-                {
-                    throw new OperationFailedException("gripper did not close");
-                }
-                //delay
-                //await Task.Delay(2000);
+                await sc.Fsol(1, "on");              
+                await sc.WaitForGrip();          
 
                 //vacuum On and check status
                 await ac.VacuumOn();
-                await Task.Delay(500);
+                await ac.WaitVacuumOn();
 
                 //Move up with vacuum
                 await ac.ZVacuumUp();
-
-                //wait for up
                 await ac.WaitForUp();
                 //check z status.
                 //check vacuum
-                await ac.WaitVacuumOn();
-             
+                //make sure in correct position
+                await sc.CheckMoveComplete("x");
+                await sc.CheckMoveComplete("y");
+
                 //align wafer
                 await ac.Align();
                 //TODO: check alignment success

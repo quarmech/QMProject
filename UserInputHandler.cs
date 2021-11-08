@@ -432,7 +432,7 @@ namespace QMProjectTektronix
             }
         }
         
-        public void Position(string[] input)
+        public async Task Position(string[] input)
         {
             if (input.Length<2)
             {
@@ -441,7 +441,8 @@ namespace QMProjectTektronix
             else
             {
                 var axis = input[1];
-                sc.Position(axis);
+                int pos = await sc.Position(axis);
+                Console.WriteLine($"position: {pos}");
             }       
         }
         public void Distance(string[] input)

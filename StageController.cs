@@ -485,9 +485,7 @@ namespace QMProjectTektronix
             //get result
             string res = await command.TSC.Task;
             //convert to int
-            Int32.TryParse(res.Split()[1], out int n);
-            //output
-            Console.WriteLine($"Position: {n}");
+            Int32.TryParse(res.Split()[1], out int n);        
             
             return n;
         }
@@ -569,11 +567,8 @@ namespace QMProjectTektronix
 
         public async Task WaitForWafer()
         {
-            
-            
             for (int i = 0; i < 100; i++)
-            {
-                
+            {           
                 bool status = await WaferSensor();
 
                 if (status)
@@ -581,10 +576,40 @@ namespace QMProjectTektronix
                     Console.WriteLine("wafer detected");
                     return;
                 }
-                await Task.Delay(1000);
-            }
-            
+                await Task.Delay(500);
+            }           
             throw new OperationFailedException("no  wafer detected");
+        }
+
+        public async Task WaitForGrip()
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                bool status = await GripperClosed();
+
+                if (status)
+                {
+                    Console.WriteLine("grip status: closed");
+                    return;
+                }
+                await Task.Delay(500);
+            }
+            throw new OperationFailedException("gripper did not open");
+        }
+        public async Task WaitForUngrip()
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                bool status = await GripperOpen();
+
+                if (status)
+                {
+                    Console.WriteLine("grip status: open");
+                    return;
+                }
+                await Task.Delay(500);
+            }
+            throw new OperationFailedException("gripper did not close");
         }
 
         public async Task<bool> TBreakOn()
@@ -615,11 +640,9 @@ namespace QMProjectTektronix
             string[] splitRes = res.Split();                        
             int.TryParse(splitRes[1], out int n);                     
             if ((n & input8_3) == 0)
-            {
-                Console.WriteLine("grip status: open");
+            {             
                 return true;
             }
-            Console.WriteLine("grip status: closed");
             return false;
         }
 
@@ -635,10 +658,8 @@ namespace QMProjectTektronix
             
             if ((n & input7_2) == 0)
             {
-                Console.WriteLine("grip status: closed");
                 return true;
             }
-            Console.WriteLine("grip status: open");
             return false;
         }
 

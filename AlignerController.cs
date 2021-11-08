@@ -62,7 +62,12 @@ namespace QMProjectTektronix
                 Command command = new Command(ascii);
                 _conn.AddCommand(command);
                 string res = await command.TSC.Task;
-                if (res == "\nD\r" || res == null)                
+                if (res == "\nD\r")                
+                {
+                    Console.WriteLine("Chuck reached up postion");
+                    break;
+                }
+                if (res == null)
                 {
                     break;
                 }

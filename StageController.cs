@@ -323,8 +323,7 @@ namespace QMProjectTektronix
             Command command;
             if (await IsMoving(axis))
             {
-                //return "axis in motion";
-                Console.WriteLine("axis in motion");
+                //return "axis in motion";               
                 throw new OperationFailedException("axis in motion");             
             }
             if (JoyStickDict[axis])
@@ -372,8 +371,7 @@ namespace QMProjectTektronix
             {
                 //await HomeAsync(axis);
                 //await CheckMoveComplete(axis);
-                Console.WriteLine($"{axis} axis not homed");
-                //throw new Exception("not homed");
+             
                 throw new OperationFailedException($"{axis} axis not homed");
                 //return;
             }

@@ -267,8 +267,7 @@ namespace QMProjectTektronix
                 catch (OperationFailedException)
                 {
                     
-                }
-                
+                }               
             }            
         }
 

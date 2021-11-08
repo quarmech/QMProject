@@ -31,24 +31,28 @@ namespace QMProjectTektronix
                 //pick up wafer
                 await sc.MoveAbsoluteAsync("x", Positions.XAlignLocation);               
                 await sc.MoveAbsoluteAsync("y", Positions.Center["y"]);
-                await sc.CheckMoveComplete("x");
-                await sc.CheckMoveComplete("y");
-
-                ac.VacuumOff();
-                await ac.WaitVacuumOff();   
 
                 //ungrip
                 await sc.Fsol(2, "on");
 
+                //vacuum off
+                ac.VacuumOff();
+                await ac.WaitVacuumOff();   
+                
+                //move chuck up
                 ac.MoveUp();
                 await ac.WaitForUp();
+
+                //wait for stage to finish moving
+                await sc.CheckMoveComplete("x");
+                await sc.CheckMoveComplete("y");
 
                 Console.WriteLine("ready for wafer");
             }
             catch (OperationFailedException ex)
             {
                 Stop = true;
-                Console.WriteLine("routine failed:" + ex);
+                Console.WriteLine("routine failed:" + ex.Message);
             }
         }
 
@@ -99,7 +103,7 @@ namespace QMProjectTektronix
             catch (OperationFailedException ex)
             {
                 Stop = true;
-                Console.WriteLine("operation failed:" + ex);
+                Console.WriteLine("operation failed:" + ex.Message);
             }
         }
         

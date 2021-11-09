@@ -8,6 +8,7 @@ namespace QMProjectTektronix
 {
     public class Positions
     {
+        public static int TPerpendicularOffSet = 0;
 
         public static int XAlignLocation = 317955;
 

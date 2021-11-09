@@ -86,8 +86,7 @@ namespace QMProjectTektronix
             CancellationTokenSource source = new CancellationTokenSource(10000);
 
             while (!source.IsCancellationRequested)
-            {
-                
+            {             
                 string ascii = "ZRS";
                 Command command = new Command(ascii);
                 _conn.AddCommand(command);
@@ -104,8 +103,6 @@ namespace QMProjectTektronix
             }
             throw new OperationFailedException("Moving up timedout");
         }
-
-
 
         public async Task WaitForAlign()
         {

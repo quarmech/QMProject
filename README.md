@@ -15,6 +15,7 @@ Connection - Serial port connection, read/writes commands, Handles Command Queue
 
 ## Description:
 
+Program to control X,Y,Z,T stages and aligner. 
 
 ## Commands:
 

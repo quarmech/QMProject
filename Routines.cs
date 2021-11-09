@@ -44,8 +44,8 @@ namespace QMProjectTektronix
                 await ac.WaitForUp();
 
                 //wait for stage to finish moving
-                await sc.CheckMoveComplete("x");
-                await sc.CheckMoveComplete("y");
+                await sc.WaitMoveComplete("x");
+                await sc.WaitMoveComplete("y");
 
                 Console.WriteLine("ready for wafer");
             }
@@ -91,8 +91,8 @@ namespace QMProjectTektronix
                 await ac.WaitForUp();
 
                 //make sure in correct position
-                await sc.CheckMoveComplete("x");
-                await sc.CheckMoveComplete("y");
+                await sc.WaitMoveComplete("x");
+                await sc.WaitMoveComplete("y");
 
                 //align wafer
                 await ac.Align();
@@ -112,9 +112,9 @@ namespace QMProjectTektronix
             while (!Stop)
             {
                 await sc.HomeStage("y");
-                await sc.CheckMoveComplete("y");
+                await sc.WaitMoveComplete("y");
                 await sc.MoveAbsoluteAsync("y", 200000);
-                await sc.CheckMoveComplete("y");
+                await sc.WaitMoveComplete("y");
             }
             Stop = false;
         }

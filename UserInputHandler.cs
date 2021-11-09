@@ -515,7 +515,7 @@ namespace QMProjectTektronix
             }
         }
         
-        public void Home(string[] input)
+        public async Task Home(string[] input)
         {           
             string axis;
             if (input.Length<2)
@@ -524,8 +524,16 @@ namespace QMProjectTektronix
             }
             else
             {
-                axis = input[1];
-                sc.HomeStage(axis);
+                axis = input[1];             
+                try
+                {
+                    await sc.HomeStage(axis);
+                    Console.WriteLine("moving started");
+                }
+                catch (OperationFailedException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }           
         }      
 

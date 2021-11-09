@@ -246,34 +246,22 @@ namespace QMProjectTektronix
             await JoyStickFast(axis);
         }
 
-        public async Task<bool> CheckMoveComplete(string axis)
+        public async Task<bool> WaitMoveComplete(string axis)
         {
-            //Command errorCommand = Error(axis);
-            //that returns command object
-            //run a loop to wait for commmand.Data to be updated?
-            //do logic
-            //var code = await errorCommand.TSC.Task;
-            /*
-            while(errorCommand.Data==null)
-            {
-
-            }
-            */
-            //Console.WriteLine("newCheckMoveComplete: " + code);
-
             int errorCode;
             int currentPos;
             int? prevPos = null;
             int bit27 = 134217728;
             int repeatCount = 0;
             while(true)
-            {           
+            {   
+                //check if stage has stopped
                 errorCode = await Error(axis);
                 if (((errorCode & bit27) != bit27))
                 {
-                    //Moving = false;
                     return false;
                 }
+                //check if stage stuck
                 currentPos = await Position(axis);
                 if (currentPos == prevPos)
                 {
@@ -281,11 +269,10 @@ namespace QMProjectTektronix
                 }
                 if (repeatCount>5)
                 {
-                    //Moving = false;
                     return false;
                 }
                 prevPos = currentPos;
-                await Task.Delay(1000);
+                await Task.Delay(100);
             }
         }
  
@@ -295,18 +282,15 @@ namespace QMProjectTektronix
             Command command;
             if (await IsMoving(axis))
             {
-                //return "axis in motion";
-                //Console.WriteLine("axis in motion");
+                throw new OperationFailedException("axis in motion");
             }
             if (JoyStickDict[axis])
             {
                 JoyStickOff(axis);
             }
             ascii = $"{Axis(axis)} t 2";
-            //_conn.Write($"{Axis(axis)} t 2");
             command = new Command(ascii);
             _conn.AddCommand(command);
-
         }
 
         public async Task<bool> IsMoving(string axis)
@@ -327,7 +311,6 @@ namespace QMProjectTektronix
             Command command;
             if (await IsMoving(axis))
             {
-                //return "axis in motion";               
                 throw new OperationFailedException("axis in motion");             
             }
             if (JoyStickDict[axis])
@@ -372,14 +355,10 @@ namespace QMProjectTektronix
             //check if homed
             bool homed = await IsHomed(axis);
             if(!homed)
-            {
-                //await HomeAsync(axis);
-                //await CheckMoveComplete(axis);
-             
+            {             
                 throw new OperationFailedException($"{axis} axis not homed");
-                //return;
-            }
 
+            }
             SetAbsolute(axis);
             Distance(axis, pos);
             await MoveAsync(axis);
@@ -464,8 +443,7 @@ namespace QMProjectTektronix
             Command command = new Command(ascii);
             _conn.AddCommand(command);
             string res = await command.TSC.Task;
-            
-           
+                      
             int.TryParse(res, out int nres);
 
             return nres;

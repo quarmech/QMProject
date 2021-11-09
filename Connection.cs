@@ -27,8 +27,8 @@ namespace QMProjectTektronix
 
             ReadWriteTime = RWTime;
 
-            base.ReadTimeout = ReadWriteTime;
-            base.WriteTimeout = ReadWriteTime;
+            base.ReadTimeout = 1000;
+            base.WriteTimeout = 1000;
             
             ComPortName = "COM" + ComPortNum;
             Console.WriteLine($"intializing at {ComPortName}");                   
@@ -75,7 +75,7 @@ namespace QMProjectTektronix
             foreach (var command in commandQueue.GetConsumingEnumerable())
             {                               
                 await ProcessCommand(command);
-                await Task.Delay(100);
+                //await Task.Delay(100);
             }                   
         }
         
@@ -84,13 +84,14 @@ namespace QMProjectTektronix
             commandQueue.Add(command);
         }
 
+        //Writes, Reads, and Outputs commands
         public async Task ProcessCommand(Command command)
         {          
             string res = "";
             Write(command.Ascii,false);
             if (command.Read)
             {
-                res = await Task.Run(() => ReadBytes2());
+                res = await Task.Run(() => ReadBytes());
                 if (command.Display)
                 {
                     Console.WriteLine("response: " + res);
@@ -230,7 +231,7 @@ namespace QMProjectTektronix
             return res;
         }
 
-        public string ReadBytes2()
+        public string ReadBytes()
         {            
             if (Opened==false)
             {
@@ -297,6 +298,10 @@ namespace QMProjectTektronix
 
         public void End()
         {
+            while(commandQueue.Count>0)
+            {
+                Thread.Sleep(100);
+            }
             commandQueue.CompleteAdding();
             Opened = false;
             base.Close();

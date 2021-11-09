@@ -51,7 +51,7 @@ namespace QMProjectTektronix
             }
             else if (stringComparer.Equals("pos", code))
             {
-                await Position(splitInput);
+                Position(splitInput);
             }
             else if (stringComparer.Equals("dis", code))
             {
@@ -59,7 +59,7 @@ namespace QMProjectTektronix
             }
             else if (stringComparer.Equals("vel", code))
             {
-                res = await Velocity(splitInput);
+                Velocity(splitInput);
             }
             else if (stringComparer.Equals("accel", code))
             {
@@ -107,7 +107,7 @@ namespace QMProjectTektronix
             }
             else if (stringComparer.Equals("pickupandalign", code))
             {
-                await Routines.PickUpWaferAndAlign(sc, ac, 300);
+                await Routines.PickUpWaferAndAlignCycle(sc, ac, 300);
             }
             else if (stringComparer.Equals("error", code))
             {
@@ -127,11 +127,12 @@ namespace QMProjectTektronix
             }
             else if (stringComparer.Equals("read", code))
             {
-                sc._conn.ReadBytes2();
+                sc._conn.ReadBytes();
+                Console.WriteLine(res);
             }
             else if (stringComparer.Equals("aread", code))
             {
-                res = ac._conn.ReadBytes2();
+                res = ac._conn.ReadBytes();
                 Console.WriteLine(res);
             }
             else if (stringComparer.Equals("aclear", code))
@@ -194,6 +195,10 @@ namespace QMProjectTektronix
             {
                 sc.Fsol(2, "on");
             }
+            else if (stringComparer.Equals("tbreak", code))
+            {
+                TBreak();
+            }
             else if (stringComparer.Equals("rotatewafer", code))
             {
                 RotateWafer(splitInput);
@@ -205,7 +210,19 @@ namespace QMProjectTektronix
             return res;
         }
 
-        
+        public async Task TBreak()
+        {
+            if(await sc.TBreakOn())
+            {
+                sc.Fsol(5, "on");
+                Console.WriteLine("TBreak turned off");
+            }
+            else
+            {
+                sc.Fsol(5, "off");
+                Console.WriteLine("TBreak turned on");
+            }
+        }
 
         public async Task TBreakStatus()
         {
@@ -223,8 +240,7 @@ namespace QMProjectTektronix
 
         public async Task GripStatus()
         {
-            bool open = await sc.GripperOpen();
-            //bool close = await sc.GripperClosed();
+            bool open = await sc.GripperOpen();           
             if (open)
             {
                 Console.WriteLine("gripper opened");
@@ -244,7 +260,14 @@ namespace QMProjectTektronix
             else
             {               
                 axis = input[1];
-                await sc.MoveAbsoluteAsync(axis, Positions.Center[axis]);
+                try
+                {
+                    await sc.MoveAbsoluteAsync(axis, Positions.Center[axis]);
+                }
+                catch (OperationFailedException)
+                {
+                    
+                }               
             }            
         }
 
@@ -258,16 +281,19 @@ namespace QMProjectTektronix
             else
             {
                 axis = input[1];
-                await sc.MoveAbsoluteAsync(axis, Positions.PosLimit[axis]);
+                try
+                {
+                    await sc.MoveAbsoluteAsync(axis, Positions.PosLimit[axis]);
+                }
+                catch (OperationFailedException)
+                {
+                    
+                }
             }
         }
         
-
-        public async Task Quit()
-        {         
-            //await sc.End();
-            //await ac.End();
-          
+        public void Quit()
+        {                
             Program.End = true;
         }
         public void Stop()
@@ -288,25 +314,27 @@ namespace QMProjectTektronix
 
         public async Task RotateWafer(string[] input)
         {
-            try
-            {
-                var value = input[1];
-                //Int32.TryParse(Split()[1], out int n);
-                await ac.RotateWafer(value);
-            }
-            catch (IndexOutOfRangeException)
+            if (input.Length < 2)
             {
                 Console.WriteLine("no value given");
             }
-
+            else 
+            {
+                var value = input[1];
+                await ac.RotateWafer(value);
+            }
         }
+
         public async Task Error(string[] input)
         {
-            try
+            if (input.Length < 2)
+            {
+                Console.WriteLine("no axis given");
+            }
+            else
             {
                 var axis = input[1];
-                //sc.Error(axis);
-                
+
                 int errorNum = await sc.Error(axis);
 
                 Console.WriteLine($"error code: {errorNum}");
@@ -317,38 +345,34 @@ namespace QMProjectTektronix
                     {
                         Console.WriteLine($"{Math.Log10(key) / Math.Log10(2)} : {sc.Errors[key]}");
                     }
-                }            
-            }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("no axis given");
+                }
             }
         }
 
         public void JoyStickFast(string[] input)
         {
-            try
+            if(input.Length < 2)
+            {
+                Console.WriteLine("no axis given");
+            }
+            else
             {
                 var axis = input[1];
                 sc.JoyStickFast(axis);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("no axis given");
             }
         }
 
         
         public void JoyStickSlow(string[] input)
         {
-            try
+            if (input.Length < 2)
+            {
+                Console.WriteLine("no axis given");
+            }
+            else
             {
                 var axis = input[1];
                 sc.JoyStickSlow(axis);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("no axis given");
             }
         }
         public void JoyStickOff(string[] input)
@@ -366,267 +390,206 @@ namespace QMProjectTektronix
 
         public void Deceleration(string[] input)
         {
-            try
-            {
-                var axis = input[1];
-                try
-                {
-                    int pos = Int32.Parse(input[2]);
-                    sc.Deceleration(axis, pos); //set
-                }
-                catch (IndexOutOfRangeException)
-                {
-                    sc.Deceleration(axis, null); //get
-                    //Print(res);
-                }
-            }
-            catch (IndexOutOfRangeException)
+            string axis;
+            if (input.Length == 1)
             {
                 Console.WriteLine("no axis given");
+            }
+            else if (input.Length == 2) //get
+            {
+                axis = input[1];
+                sc.Deceleration(axis, null);
+            }
+            else if (input.Length == 3) //set
+            {
+                axis = input[1];
+                int.TryParse(input[2], out int value);
+                sc.Deceleration(axis, value);
             }
         }
         public void Acceleration(string[] input)
         {
-            try
-            {
-                var axis = input[1];
-                try
-                {
-                    int pos = Int32.Parse(input[2]);
-                    //int res = sc.Acceleration(axis, pos); //set
-                    sc.Acceleration(axis, pos);
-                }
-                catch (IndexOutOfRangeException)
-                {
-                    //int res = sc.Acceleration(axis, null); //get
-                    //Print(res);
-                    sc.Acceleration(axis, null);
-                }             
-            }
-            catch (IndexOutOfRangeException)
+            string axis;
+            if (input.Length == 1)
             {
                 Console.WriteLine("no axis given");
             }
+            else if (input.Length == 2)
+            {
+                axis = input[1];
+                sc.Acceleration(axis, null);
+            }
+            else if (input.Length == 3)
+            {
+                axis = input[1];
+                int.TryParse(input[2], out int value);              
+                sc.Acceleration(axis, value);
+            }
         }
-        public async Task<string> Velocity2(string[] input)
+        public void Velocity(string[] input)
         {
-            string res = "";
+            string axis;
             if (input.Length==1)
             {
-                res = "no axis given";
+                Console.WriteLine("no axis given");             
             }
             else if(input.Length==2)
             {
-                var axis = input[1];
-                res = await sc.Velocity(axis, null);
-                if (input.Length==3)
-                {
-                    int value;
-                    int.TryParse(input[2], out value);
-                    await sc.Velocity(axis, value);
-                }
-            }
-
-            Console.WriteLine("Velocity: " + res);
-            return res;
-        }
-        public async Task<string> Velocity(string[] input)
-        {
-            //Console.WriteLine("in consoleAPP velocity");
-            string res = "";
-
-            try
-            {
-                var axis = input[1];
-                try
-                {
-                    int pos = Int32.Parse(input[2]);
-                    //int n = await sc.Velocity(axis, pos);  //set
-                    res = await sc.Velocity(axis, pos);
-                    //res = n.ToString();  
-                }
-                catch (IndexOutOfRangeException)
-                {
-                    //int n = await sc.Velocity(axis, null); //get
-                    res = await sc.Velocity(axis, null);
-                    //res = n.ToString();
-                }               
-            }
-            catch (IndexOutOfRangeException)
-            {
-                res = "no axis given";
+                axis = input[1];
+                sc.Velocity(axis, null);
                 
             }
-            Console.WriteLine(res);
-            return res;
+            else if (input.Length == 3)
+            {
+                axis = input[1];
+                int.TryParse(input[2], out int value);
+                sc.Velocity(axis, value);
+            }
         }
+        
         public async Task Position(string[] input)
         {
-            string res = "";
-            try
+            if (input.Length<2)
+            {
+                Console.WriteLine("no axis given");
+            } 
+            else
             {
                 var axis = input[1];
-                //int n = await sc.Position(axis); // get
-                //sc.Position(axis);
-                sc.Position(axis); // get
-                //res = n.ToString();              
-            }
-            catch (IndexOutOfRangeException)
-            {
-                res = "no axis given";              
-            }
-            //Console.WriteLine("Position: " + res);
-            
+                int pos = await sc.Position(axis);
+                Console.WriteLine($"position: {pos}");
+            }       
         }
         public void Distance(string[] input)
         {
-            try
+            string axis;           
+            
+            if (input.Length == 1)
             {
-                var axis = input[1];
-                try
-                {
-                    int pos = Int32.Parse(input[2]);
-                    //int res = sc.Distance(axis, pos); //set
-                    sc.Distance(axis, pos);
-
-                }
-                catch
-                {
-                    //int res = sc.Distance(axis, null); //get
-                    sc.Distance(axis, null);
-                    //Print(res);
-                }                                          
+                Console.WriteLine("no axis given");              
             }
-            catch (IndexOutOfRangeException)
+            else if (input.Length == 2)
             {
-                Console.WriteLine("no axis given");
-            }           
+                axis = input[1];
+                sc.Distance(axis, null);
+            } 
+            else if (input.Length == 3)
+            {
+                axis = input[1];
+                int.TryParse(input[2], out int value);
+                sc.Distance(axis, value);
+            }
         }
         public void SetAbsolute(string[] input)
         {
-            try
+            if (input.Length<2)
+            {
+                Console.WriteLine("no axis given");
+            }
+            else
             {
                 var axis = input[1];
                 sc.SetAbsolute(axis);
             }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("no axis given");
-            }
         }
         public void SetRelative(string[] input)
         {
-            try
+            if (input.Length < 2)
+            {
+                Console.WriteLine("no axis given");
+            }
+            else
             {
                 var axis = input[1];
                 sc.SetRelative(axis);
             }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("no axis given");
-            }
         }
         
-        public async Task<string> Home(string[] input)
-        {
-            string res = "";
+        public void Home(string[] input)
+        {           
             string axis;
             if (input.Length<2)
             {
-                Console.WriteLine("no axis given");
-                res = "no axis given";
+                Console.WriteLine("no axis given");               
             }
             else
             {
                 axis = input[1];
-                res = await sc.HomeAsync(axis);
-            }
-            Console.WriteLine(res);
-            return res;
+                sc.HomeStage(axis);
+            }           
         }      
 
-        public async Task<string> MoveAbsolute2(string[] input)
+        public async Task MoveAbsolute(string[] input)
         {
-            string res = "";
             string axis;
             int position;
             if (input.Length<3)
+            {              
+                Console.WriteLine("no axis or no position given");
+            }
+            else
             {
-                res = "no axis or no position given";
+                axis = input[1];              
+                int.TryParse(input[2], out position);
+                try
+                {
+                    await sc.MoveAbsoluteAsync(axis, position);
+                    Console.WriteLine("moving started");
+                }
+                catch(OperationFailedException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }  
+            }
+        }
+
+        
+        public async Task MoveRelative(string[] input)
+        {
+            string axis;
+            int position;
+            if (input.Length < 3)
+            {
+                Console.WriteLine("no axis or no position given");
             }
             else
             {
                 axis = input[1];
-                position = Int32.Parse(input[2]);              
-                sc.MoveAbsoluteAsync(axis, position);
-                res = "moving started";
-            }
-            Console.WriteLine(res);
-            return res;
-        }
-        public async Task<string> MoveAbsolute(string[] input)
-        {
-            string res = "";
-            string axis;
-            int position;
-            try
-            {
-                axis = input[1];
-                position = Int32.Parse(input[2]);
-                //res = await sc.MoveAbsoluteAsync(axis, position);
-                sc.MoveAbsoluteAsync(axis, position);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                res = "no axis or no position given";                
-            }
-            Console.WriteLine(res);
-            return res;
+                int.TryParse(input[2], out position);
+                try
+                {
+                    await sc.MoveRelativeAsync(axis, position);
+                    Console.WriteLine("moving started");
+                }
+                catch (OperationFailedException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }          
         }
 
-        
-        public async Task<string> MoveRelative(string[] input)
-        {
-            string res = "";
-            string axis;
-            int position;
-            try
-            {
-                axis = input[1];
-                position = Int32.Parse(input[2]);
-                //res = await sc.MoveRelativeAsync(axis, position);
-                sc.MoveRelativeAsync(axis, position);
-                //Console.WriteLine($"moving done, current position is : {m}");
-            }
-            catch (IndexOutOfRangeException)
-            {
-                res = "no axis or no position given";              
-            }
-            Console.WriteLine(res);
-            return res;
-        }
         public void MotorOn(string[] input)
         {
-            try
+            if (input.Length < 2)
+            {
+                Console.WriteLine("no axis given");
+            }
+            else
             {
                 var axis = input[1];
                 sc.MotorOn(axis);
             }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("no axis given");
-            }
         }
         public void MotorOff(string[] input)
         {
-            try
+            if (input.Length < 2)
+            {
+                Console.WriteLine("no axis given");
+            }
+            else
             {
                 var axis = input[1];
                 sc.MotorOff(axis);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("no axis given");
             }
         }
 
@@ -652,23 +615,9 @@ namespace QMProjectTektronix
             }
         }
 
-        /*
-         * Aligner
-         * 
-         */
-
         public async Task VacuumStatus()
         {
-            bool status = await ac.VacuumStatus();
-            //bool close = await sc.GripperClosed();
-            if (status)
-            {
-                Console.WriteLine("vacuum is on");
-            }
-            else
-            {
-                Console.WriteLine("vacuum is off");
-            }
+            await ac.VacuumStatus();
         }
 
         public async Task WaferStatus()

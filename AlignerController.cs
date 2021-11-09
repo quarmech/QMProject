@@ -16,7 +16,7 @@ namespace QMProjectTektronix
             _conn = comm;
         }
 
-        public async Task End()
+        public void End()
         {         
             //close port
             _conn.End();
@@ -30,7 +30,7 @@ namespace QMProjectTektronix
             string res = await command.TSC.Task;          
         }
 
-        public async Task<string> Home()
+        public async Task<string> MoveDown()
         {
             string ascii = "ZMD";
             Command command = new Command(ascii);
@@ -44,37 +44,41 @@ namespace QMProjectTektronix
             string ascii = "RVC";
             Command command = new Command(ascii);
             _conn.AddCommand(command);
-            string res = await command.TSC.Task;
-            
+            string res = await command.TSC.Task;           
             if (res=="\n255\r")
             {
-                Console.WriteLine("vacuum is on");
+                Console.WriteLine("vacuum status: on");
                 return true;
             }
-            Console.WriteLine("vacuum is off");
+            Console.WriteLine("vacuum status: off");
             return false;
         }
 
-        public async Task CheckHome()
+        public async Task WaitForDown()
         {
-            while(true)
+            for (int i = 0; i < 100; i++)
             {
                 string ascii = "ZRS";
                 Command command = new Command(ascii);
                 _conn.AddCommand(command);
                 string res = await command.TSC.Task;
-                //int.TryParse(res, out int n);
-                Console.Write("n:" + res);
                 if (res == "\nD\r")                
                 {
-                    break;
+                    Console.WriteLine("Chuck reached up postion");
+                    return;
                 }
+                if (res == null)
+                {
+                    throw new OperationFailedException("could not read z position status");
+                }
+                await Task.Delay(100);
             }
+            throw new OperationFailedException("Moving up timedout");
         }
 
-        public async Task WaitForChuckUp()
+        public async Task WaitForUp()
         {
-            while (true)
+            for (int i = 0; i < 100; i++)
             {
                 string ascii = "ZRS";
                 Command command = new Command(ascii);
@@ -82,53 +86,54 @@ namespace QMProjectTektronix
                 string res = await command.TSC.Task;
                 if (res == null)
                 {
-                    break;
+                    throw new OperationFailedException("could not read z position status");
                 }
-                //int.TryParse(res, out int n);
-                //Console.Write("n:" + res);
                 if (res == "\nU\r")
                 {
-                    break;
+                    Console.WriteLine("Chuck reached up postion");
+                    return;
                 }
-                Console.WriteLine("chuck is in up position");
+                await Task.Delay(100);
             }
+            throw new OperationFailedException("Moving up timedout");
         }
 
-        public async Task CheckAlign()
-        {          
-            while (true)
+
+
+        public async Task WaitForAlign()
+        {
+            for (int i = 0; i < 100; i++)
             {
+                //create command
                 string ascii = "ASG";
                 Command command = new Command(ascii);
                 _conn.AddCommand(command);
-          
+                //get response
                 string res = await command.TSC.Task;
+
                 if (res==null)
                 {
-                    break;
-                }
-  
-                //int.TryParse(res, out int n);
-                Console.Write("n:" + res);
+                    throw new OperationFailedException("could not read align status");
+                }                           
                 if (res == "\nC\r")
                 {
                     Console.WriteLine("align complete");
-                    break;
+                    return;
                 }
                 if (res == "\nF\r")
                 {
-                    Console.WriteLine("align failed");
-                    break;
+                    throw new OperationFailedException("align failed");                   
                 }
+                await Task.Delay(500);
             }
+            throw new OperationFailedException("align timed out");
         }
 
-        public async Task MoveUp()
+        public void MoveUp()
         {
             string ascii = "ZMX";
             Command command = new Command(ascii);
-            _conn.AddCommand(command);
-            string res = await command.TSC.Task;
+            _conn.AddCommand(command);           
         }
 
         public async Task VacuumOn()
@@ -139,27 +144,42 @@ namespace QMProjectTektronix
             string res = await command.TSC.Task;
         }
 
-        public async Task VacuumOff()
+        public void VacuumOff()
         {
             string ascii = "VAC0";
             Command command = new Command(ascii);
-            _conn.AddCommand(command);
-            string res = await command.TSC.Task;
+            _conn.AddCommand(command);          
         }
 
         public async Task WaitVacuumOn()
         {
             for(int i=0; i<100; i++)
             {
-                await Task.Delay(1000);
+                await Task.Delay(500);
                 bool status = await VacuumStatus();
 
                 if (status)
                 {
-                    break;
+                    return;
                 }
                     
             }
+            throw new OperationFailedException("failed: vacuum did not turn on");
+        }
+        public async Task WaitVacuumOff()
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                await Task.Delay(500);
+                bool status = await VacuumStatus();
+
+                if (!status)
+                {
+                    return;
+                }
+
+            }
+            throw new OperationFailedException("failed: vacuum did not turn off");
         }
 
         public async Task ZVacuumUp()

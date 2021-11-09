@@ -11,7 +11,7 @@ namespace QMProjectTektronix
         static public bool Stop { get; set; } = false;
 
         static Routines(){}
-        static public async Task PickUpWaferAndAlign(StageController sc, AlignerController ac, int size)
+        static public async Task PickUpWaferAndAlignCycle(StageController sc, AlignerController ac, int size)
         {
             int count = 0;
             Stop = false;
@@ -29,41 +29,35 @@ namespace QMProjectTektronix
             try
             {
                 //pick up wafer
-                await sc.MoveAbsoluteAsync("x", Positions.XAlignLocation);
-                //await sc.CheckMoveComplete("x");
+                await sc.MoveAbsoluteAsync("x", Positions.XAlignLocation);               
                 await sc.MoveAbsoluteAsync("y", Positions.Center["y"]);
-                await sc.CheckMoveComplete("y");
-
-                //await Task.WhenAll(sc.MoveAbsoluteAsync("x", Positions.PosLimit["x"]), sc.MoveAbsoluteAsync("y", Positions.Center["y"]) );
-                await ac.VacuumOff();
-                //if vacuum still on return;
-                bool vacuum = await ac.VacuumStatus();
-                if (vacuum)
-                {
-                    throw new OperationFailedException("vacuum did not shut off");
-                    //Console.WriteLine("vacuum did not shut off");
-                    //Stop = true;
-                    //return;
-                }
 
                 //ungrip
                 await sc.Fsol(2, "on");
 
-                await ac.MoveUp();
-                await ac.WaitForChuckUp();
+                //vacuum off
+                ac.VacuumOff();
+                await ac.WaitVacuumOff();   
+                
+                //move chuck up
+                ac.MoveUp();
+                await ac.WaitForUp();
+
+                //wait for stage to finish moving
+                await sc.CheckMoveComplete("x");
+                await sc.CheckMoveComplete("y");
+
                 Console.WriteLine("ready for wafer");
             }
             catch (OperationFailedException ex)
             {
                 Stop = true;
-                Console.WriteLine("operation failed");
+                Console.WriteLine("routine failed:" + ex.Message);
             }
         }
 
         static public async Task AlignWafer(StageController sc, AlignerController ac, int size)
         {
-            //await Task.WhenAll(sc.MoveAbsoluteAsync("x", Positions.PosLimit["x"]), sc.MoveAbsoluteAsync("y", Positions.Center["y"]) );
-            //await Task.Delay(3000);
             try
             {
                 await sc.WaitForWafer();
@@ -71,76 +65,45 @@ namespace QMProjectTektronix
                 //Go to align position
                 await sc.MoveAbsoluteAsync("x", Positions.XAlignLocation);
                 await sc.MoveAbsoluteAsync("y", Positions.YAlignLocations[size]);
-                //await sc.CheckMoveComplete("y");
-                //await Task.WhenAll(sc.MoveAbsoluteAsync("x", Positions.XAlignLocation), sc.MoveAbsoluteAsync("y", Positions.YAlignLocation[size]));
-
+                
                 //ungrip
                 await sc.Fsol(2, "on");
-                //TODO: check if delay enought
-                await Task.Delay(100);
-                //check gripper status via presence sensor
-                bool isClosed = await sc.GripperClosed();
-                if (isClosed)
-                {
-                    Console.WriteLine("gripper did not open");
-                    Stop = true;
-                    return;
-                }
+                await sc.WaitForUngrip();
 
-                //turn off vacuum and check status
-                await ac.VacuumOff();
-                bool vacuum = await ac.VacuumStatus();
-                if (vacuum)
-                {
-                    Console.WriteLine("vacuum did not shut off");
-                    Stop = true;
-                    return;
-                }
+                //turn off vacuum
+                ac.VacuumOff();
+                await ac.WaitVacuumOff();         
 
                 //move wafer down
-                var a = await ac.Home();
-                //wait for chuck to be down
-                await ac.CheckHome();
-                //center wafer (grip)
-                await sc.Fsol(1, "on");
-                await Task.Delay(500);
-                //TODO: check grip status
-                bool open = await sc.GripperOpen();
-                if (open)
-                {
-                    Console.WriteLine("gripper did not close");
-                    Stop = true;
-                    return;
-                }
-                //delay
-                //await Task.Delay(2000);
+                var a = await ac.MoveDown();              
+                await ac.WaitForDown();
 
-                //vacuum On and check status
+                //center wafer (grip)
+                await sc.Fsol(1, "on");              
+                await sc.WaitForGrip();          
+
+                //vacuum On
                 await ac.VacuumOn();
-                await Task.Delay(500);
+                await ac.WaitVacuumOn();
 
                 //Move up with vacuum
                 await ac.ZVacuumUp();
+                await ac.WaitForUp();
 
-                //tODO: wait for up
-                await ac.WaitForChuckUp();
-                //check z status.
-                //check vacuum
-                await ac.WaitVacuumOn();
-             
+                //make sure in correct position
+                await sc.CheckMoveComplete("x");
+                await sc.CheckMoveComplete("y");
+
                 //align wafer
                 await ac.Align();
-                //TODO: check alignment success
-                //wait for align to complete
-                await Task.Delay(2000);
-                await ac.CheckAlign();
+                await ac.WaitForAlign();
 
                 Console.WriteLine("wafer aligned");
             }
-            catch (OperationFailedException)
+            catch (OperationFailedException ex)
             {
                 Stop = true;
-                Console.WriteLine("operation failed");
+                Console.WriteLine("operation failed:" + ex.Message);
             }
         }
         
@@ -148,7 +111,7 @@ namespace QMProjectTektronix
         {
             while (!Stop)
             {
-                await sc.HomeAsync("y");
+                await sc.HomeStage("y");
                 await sc.CheckMoveComplete("y");
                 await sc.MoveAbsoluteAsync("y", 200000);
                 await sc.CheckMoveComplete("y");

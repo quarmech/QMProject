@@ -13,11 +13,11 @@ namespace QMProjectTektronix
         static StageController stageControls = new StageController(stageConnection);
         static AlignerController alignerContorls = new AlignerController(alignerConnection);
 
-        static UserInputHandler consoleApp = new UserInputHandler(stageControls, alignerContorls);
+        static UserInputHandler UserInputHandler = new UserInputHandler(stageControls, alignerContorls);
 
         public static bool End = false;
         
-        public static async Task Main()
+        public static void Main()
         {
             
             stageConnection.OpenPort();
@@ -32,15 +32,15 @@ namespace QMProjectTektronix
             {               
                 string input = Console.ReadLine();
 
-                consoleApp.UserCommand(input);              
+                UserInputHandler.UserCommand(input);              
             }
-            await EndProcedure();
+            EndProcedure();
         }
 
-        public static async Task EndProcedure()
+        public static void EndProcedure()
         {
-            await stageControls.End();
-            await alignerContorls.End();
+            stageControls.End();
+            alignerContorls.End();
         }
               
 

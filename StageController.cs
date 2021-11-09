@@ -1,4 +1,3 @@
-//using QMProjectTektronix;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,13 +8,10 @@ namespace QMProjectTektronix
 {
     public class StageController
     {
-        public Connection _conn;       
+        public Connection _conn;
         public bool Moving { get; private set; } = false;
         public IDictionary<int, string> Errors { get; private set; }
         public IDictionary<string, bool> JoyStickDict { get; private set; }
-
-        //public IDictionary<string, bool> MovingDict { get; private set; }
-
 
         public StageController(Connection comm)
         {
@@ -24,49 +20,30 @@ namespace QMProjectTektronix
             {
                 _conn = comm;
                 AddErrorBits();
-                //SetupAxis();
-                SetupJoystick();
-                //Reset();
-                //SetupMotors();
+                SetupJoystick();           
             } 
-            catch 
+            catch
             {
                 Console.WriteLine("Error: Could not connect to Stages");
             }
-  
         }
-
 
         public void SetupMotors()
         {
             Console.WriteLine("seting up stage controls...");
 
-            //Activate all motors
-            
+            //Activate all motors          
             MotorOn("x");
             MotorOn("y");
             MotorOn("z");
-            MotorOn("t");
-            
-            
-            //_conn.Write("0 s r0xab 1", true);
-            //_conn.Write("1 s r0xab 1", true);
-            //_conn.Write("2 s r0xab 1", true);
-            //_conn.Write("3 s r0xab 1", true);
-            /*
-            _conn.Write("0 s r0x24 21", true);
-            _conn.Write("1 s r0x24 21", true);
-            _conn.Write("2 s r0x24 21", true);
-            _conn.Write("3 s r0x24 21", true);
-            */
-            //set to position loop control
-            
-            _conn.AddCommand(new Command("0 s r0x24 21", true, false));
-            _conn.AddCommand(new Command("0 s r0x24 21", true, false));
-            _conn.AddCommand(new Command("0 s r0x24 21", true, false));
-            _conn.AddCommand(new Command("0 s r0x24 21", true, false));
-            
+            MotorOn("t");   
 
+            //set to position loop control          
+            _conn.AddCommand(new Command("0 s r0x24 21", true, false));
+            _conn.AddCommand(new Command("0 s r0x24 21", true, false));
+            _conn.AddCommand(new Command("0 s r0x24 21", true, false));
+            _conn.AddCommand(new Command("0 s r0x24 21", true, false));
+            
             //default values
             Distance("x", 0);
             Distance("y", 0);
@@ -84,71 +61,57 @@ namespace QMProjectTektronix
             Deceleration("x", 200000);
             Deceleration("y", 200000);
             Deceleration("z", 200000);
-            Deceleration("t", 200000);
-            
-        }    
-        
+            Deceleration("t", 200000);          
+        }
+
         public void MotorOn(string axis)
         {
-            _conn.AddCommand(new Command($"{Axis(axis)} s r0xab 1", true, false));          
+            _conn.AddCommand(new Command($"{Axis(axis)} s r0xab 1", true, false));        
         }
         public void MotorOff(string axis)
-        {
-            //_conn.Write($"{Axis(axis)} s r0xab 0");
+        {          
             _conn.AddCommand(new Command($"{Axis(axis)} s r0xab 0", true, false));
         }
 
-        public async Task Stop(string axis)
+        public void Stop(string axis)
         {
             string ascii = $"{Axis(axis)} t 0";
             Command command = new Command(ascii);
-            _conn.AddCommand(command);
-            var res = await command.TSC.Task;
+            _conn.AddCommand(command);         
         }
 
-
-        public async Task Stop()
-        {
-            /*
-            Command stopX = new Command($"0 t 0");
-            Command stopY = new Command($"1 t 0");
-            Command stopZ = new Command($"2 t 0");
-            Command stopT = new Command($"3 t 0");
-
-            _conn.AddCommand(stopX);
-            _conn.AddCommand(stopY);
-            _conn.AddCommand(stopZ);
-            _conn.AddCommand(stopT);
-            */
-            //await Task.WhenAll(stopX.TSC.Task, stopY.TSC.Task, stopZ.TSC.Task, stopT.TSC.Task);
-            await Stop("x");
-            await Stop("y");
-            await Stop("z");
-            await Stop("t");
+        public void Stop()
+        {          
+            Stop("x");
+            Stop("y");
+            Stop("z");
+            Stop("t");
         }
-        public async Task End()
+        public void End()
         {
             //turn of joystick
-            await JoyStickOff();
+            JoyStickOff();
             //stop all motors
-            await Stop();
-            //wait for processes to end
-            //Thread.Sleep(500);    
+            Stop();
+            //tbreak on
+            //Fsol(5, "off");
             //close port
             _conn.End();
         }
 
         public async Task<int> HomeCheck(string axis)
         {
+            //create command
             string ascii = $"{Axis(axis)} g r0xc9";
             Command command = new Command(ascii);
             _conn.AddCommand(command);
+
+            //get result
             var res = await command.TSC.Task;
 
-            string[] splitRes = res.Split();
-            int n;
-            int.TryParse(splitRes[1], out n);
-
+            //convert and return
+            string[] splitRes = res.Split();      
+            int.TryParse(splitRes[1], out int n);
             return n;
            
         }
@@ -166,43 +129,34 @@ namespace QMProjectTektronix
 
         public async Task<int> Error(string axis)
         {
+            //create command
             string ascii = $"{Axis(axis)} g r0xa0";
             Command command = new Command(ascii);
             _conn.AddCommand(command);
-            var errorCode = await command.TSC.Task;
-            //Console.WriteLine("newCheckMoveComplete: " + res);
-            //return res;
-            
-            //string errorCode = _conn.Write($"{Axis(axis)} g r0xa0");
-            //Console.WriteLine("error code:" + errorCode);
-            string[] errorCodeSub = errorCode.Split();
 
-            int errorNum = 0;
-            try
-            {
-                string n = errorCodeSub[1];
-                Int32.TryParse(n, out errorNum);
-            }
-            catch(IndexOutOfRangeException)
-            {
-                Console.WriteLine("IndexOutOfRangeException");
-            }          
+            //get response
+            var errorCode = await command.TSC.Task;
+            
+            //convert and return
+            string[] errorCodeSub = errorCode.Split();
+            Int32.TryParse(errorCodeSub[1], out int errorNum);      
             return errorNum;           
         }
         public async Task JoyStickFast(string axis)
         {
-            //_conn.Write($"{Axis(axis)} i r0 32769");
+            if (axis == "t" && (await TBreakOn()))
+            {
+                await Fsol(5, "on");
+            }
+            //create command
             string ascii = $"{Axis(axis)} i r0 32769";
             Command command = new Command(ascii);
             _conn.AddCommand(command);
+            //get response
             string res = await command.TSC.Task;
             JoyStickDict[axis] = true;
-            //if (axis=="z")
-            //{
-            //start joystick limit check loop
-            JoyStickLimitCheck(axis);
-            
-            //}          
+            //start limit check function
+            JoyStickLimitCheck(axis);          
         }
 
         public async Task JoyStickFast()
@@ -214,44 +168,37 @@ namespace QMProjectTektronix
         }
         public async Task JoyStickSlow(string axis)
         {
+            if (axis == "t" && (await TBreakOn()))
+            {
+                await Fsol(5, "on");
+            }
+            //create command
             string ascii = $"{Axis(axis)} i r0 32770";
             Command command = new Command(ascii);
             _conn.AddCommand(command);
+            //get response
             string res = await command.TSC.Task;
             JoyStickDict[axis] = true;
-            JoyStickLimitCheck(axis);
-
-            /*
-            _conn.Write($"{Axis(axis)} i r0 32770");
-            JoyStickDict[axis] = true;
-            if (axis=="z")
-            {               
-                await LimitCheckAsync(axis);
-            } 
-            */
+            //start limit check function          
+            JoyStickLimitCheck(axis);                  
         }
-        public async Task JoyStickOff(string axis)
+        public void JoyStickOff(string axis)
         {
             string ascii = $"{Axis(axis)} i r0 32771";
             Command command = new Command(ascii);
             _conn.AddCommand(command);
-            string res = await command.TSC.Task;
-            //_conn.Write($"{Axis(axis)} i r0 32771");
             JoyStickDict[axis] = false;
         }    
-        public async Task JoyStickOff()
+        public void JoyStickOff()
         {
-             await JoyStickOff("x");
-             await JoyStickOff("y");
-             await JoyStickOff("z");
-             await JoyStickOff("t");
+             JoyStickOff("x");
+             JoyStickOff("y");
+             JoyStickOff("z");
+             JoyStickOff("t");
         }
      
         private async Task JoyStickLimitCheck(string axis)
         {
-            //limit reached - turn off joystick
-            //if under sensor - dont do anything
-            //else start check loop
             bool limitReached = false;
             int errorCode = await Error(axis);
             int posLimitBit = pow2(9);
@@ -269,118 +216,31 @@ namespace QMProjectTektronix
                 {
                     int errorCodeN = await Error(axis);
 
-
                     if (((errorCodeN & negLimitBit) == negLimitBit) ||
                         ((errorCodeN & posLimitBit) == posLimitBit))
                     {
-                        //int row = Console.CursorTop;
-                        //Console.SetCursorPosition(20, row - 1);
                         if (!limitReached)
                         {
-                            Console.WriteLine("limit reached");
+                            Console.WriteLine("warning: limit reached");
                             limitReached = true;
-                            await JoyStickOff(axis);
-                            //wait 3 seconds turn on joystick
+                            JoyStickOff(axis);
+                            //wait n seconds turn on joystick
                             await JoyStickDelayedOn(axis);
                         }
-                        //Console.SetCursorPosition(10, row);
-                        //JoyStickOff(axis);
-                        //limitReached = true;
                     }
                     else
                     {
                         limitReached = false;
-                    }
-
-
-                    //check negative limit
-                    /*
-                    if ((errorCode & negLimitBit) == negLimitBit)
-                    {
-                        Console.WriteLine("negative limit reached");
-                        JoyStickOff(axis);
-                        //await Task.Delay(500);
-                        //await MoveRelativeAsync(axis, 1000);
-                        //JoyStickFast(axis);
-                    }
-                    if ((errorCode & posLimitBit) == posLimitBit)
-                    {
-                        Console.WriteLine("positive limit reached");
-                        JoyStickOff(axis);
-                        await Task.Delay(100);
-                        await MoveRelativeAsync(axis, -1000);
-                        //JoyStickSlow(axis);
-                    }
-                    */
-
-                    await Task.Delay(50);
+                    }                  
                 }
             }
-
         }
-
 
         public async Task JoyStickDelayedOn(string axis)
         {
             await Task.Delay(2000);
             await JoyStickFast(axis);
         }
-
-
-        /*
-        private async Task LimitCheckAsync(string axis)
-        {
-            bool limitReached = false;
-            //await Task.Delay(5000);
-            while (!limitReached)
-            {
-                //limitReached = await Task.Run(() => LimitCheck(axis));
-                await Task.Delay(100);
-            }
-            JoyStickOff(axis);
-            //await Task.Delay(1000);          
-        }
-
-        public async Task<bool> LimitCheck(string axis)
-        {
-            int errorCode = await Error(axis);
-            int posLimitBit = pow2(9);
-            int negLimitBit = pow2(10);
-
-            if (((errorCode & negLimitBit) == negLimitBit) ||
-                ((errorCode & posLimitBit) == posLimitBit))
-            {
-                return true;
-            }
-
-            return false;
-        }
-        */
-        /*
-        public async Task<int> Wait(string axis)
-        {
-            int previousPos = await Position(axis);
-            int count = 0;
-            while (true)
-            {
-                int errorCode = 0;// Error(axis);
-                int currentPos = await Position(axis);
-                int bit27 = 134217728;
-
-                //Check if done moving or stuck in same position
-                if ((errorCode & bit27) != bit27 || count >= 10)
-                {
-                    Moving = false;
-                    return currentPos;
-                }
-                if (currentPos == previousPos)
-                {
-                    count += 1;
-                    previousPos = currentPos;
-                }
-            }
-        }
-        */
 
         public async Task<bool> CheckMoveComplete(string axis)
         {
@@ -414,25 +274,13 @@ namespace QMProjectTektronix
             }
         }
  
-        public int Home(string axis)
-        {
-            
-            if (JoyStickDict[axis])
-            {
-                JoyStickOff(axis);
-            }
-            _conn.Write($"{Axis(axis)} t 2");
-            return 0;//Wait(axis);
-        }
-        
-
-        public async Task<string> HomeAsync(string axis)
+        public async Task HomeStage(string axis)
         {
             string ascii;
             Command command;
             if (await IsMoving(axis))
             {
-                return "axis in motion";
+                //return "axis in motion";
                 //Console.WriteLine("axis in motion");
             }
             if (JoyStickDict[axis])
@@ -443,11 +291,7 @@ namespace QMProjectTektronix
             //_conn.Write($"{Axis(axis)} t 2");
             command = new Command(ascii);
             _conn.AddCommand(command);
-            string res = await command.TSC.Task;
-            //Moving = true;
-            //await MoveDoneAsync(axis);
-            //await CheckMoveComplete(axis);
-            return res;
+
         }
 
         public async Task<bool> IsMoving(string axis)
@@ -462,44 +306,26 @@ namespace QMProjectTektronix
             return true;
         }
         
-        public void Move(string axis)
-        {
-            if (JoyStickDict[axis])
-            {
-                JoyStickOff(axis);
-            }
-            
-            string ascii = $"{Axis(axis)} t 1";
-            Command command = new Command(ascii);
-            _conn.AddCommand(command);
-            
-
-            //_conn.Write($"{Axis(axis)} t 1");
-            //return Wait(axis);
-        }
-        
-
         public async Task MoveAsync(string axis)
         {
             string ascii;
             Command command;
             if (await IsMoving(axis))
             {
-                //return "axis in motion";
-                Console.WriteLine("axis in motion");
+                //return "axis in motion";               
+                throw new OperationFailedException("axis in motion");             
             }
             if (JoyStickDict[axis])
             {
                 JoyStickOff(axis);
             }
+            if (axis == "t" && (await TBreakOn()))
+            {
+                await Fsol(5, "on");
+            }
             ascii = $"{Axis(axis)} t 1";
             command = new Command(ascii);
             _conn.AddCommand(command);
-            await command.TSC.Task;
-            //Moving = true;
-            //_conn.Write($"{Axis(axis)} t 1");
-            //int r = await MoveDoneAsync(axis);
-            //return "move command sent";
         }
 
         public void Send(string command)
@@ -507,57 +333,25 @@ namespace QMProjectTektronix
             _conn.AddCommand(new Command(command, true, true));
         }
 
-
         public void Reset()
         {
             //note: settigns go to default (vel,accel,decel,etc... )
-            /*
-            _conn.Write($"0 r", false);
-            _conn.Write($"1 r", false);
-            _conn.Write($"2 r", false);
-            _conn.Write($"3 r", false);
-            Thread.Sleep(1000);
-            */
+            //note2: "0 r" does not get response, so read set to false
+            
             _conn.AddCommand(new Command("0 r", false));
             _conn.AddCommand(new Command("1 r", true));
             _conn.AddCommand(new Command("2 r", true));
             _conn.AddCommand(new Command("3 r", true));
 
         }
-        
-        public void MoveRelative(string axis, int pos)
-        {
-            SetRelative(axis);
-            Distance(axis, pos);           
-            Move(axis);
-            //CheckMoveComplete(axis);
-            //return Wait(axis);
-        }
-        
+
         public async Task MoveRelativeAsync(string axis, int value)
         {
-          
-            await SetRelative(axis);
-            await Distance(axis, value);
-            //await MoveAsync(axis);
-            //return "moving done";
-            await MoveAsync(axis);
-            //await CheckMoveComplete(axis);
-            
-        }
-
-
-        
-        public void MoveAbsolute(string axis, int value)
-        {
-            SetAbsolute(axis);
+            SetRelative(axis);
             Distance(axis, value);
-            MoveAsync(axis);
-            //return Wait(axis);
-            
+            await MoveAsync(axis);     
         }
-        
-        
+
         public async Task MoveAbsoluteAsync(string axis, int pos)
         {
             //check if homed
@@ -566,37 +360,30 @@ namespace QMProjectTektronix
             {
                 //await HomeAsync(axis);
                 //await CheckMoveComplete(axis);
-                Console.WriteLine("axis not homed");
-                //throw new Exception("not homed");
-                throw new OperationFailedException("axis not homed");
+             
+                throw new OperationFailedException($"{axis} axis not homed");
                 //return;
             }
 
-            await SetAbsolute(axis);
-            await Distance(axis, pos);
+            SetAbsolute(axis);
+            Distance(axis, pos);
             await MoveAsync(axis);
-            
-            //return "moving done";
-
         }
         
-        public async Task<string> SetAbsolute(string axis)
+        public void SetAbsolute(string axis)
         {           
-            //_conn.Write($"{Axis(axis)} s r0xc8 0");
+            //create command
             string ascii = $"{Axis(axis)} s r0xc8 0";
-            Command command = new Command(ascii);
-            _conn.AddCommand(command);
-            string res = await command.TSC.Task;
-            return res;
+            Command command = new Command(ascii, true, false);
+            _conn.AddCommand(command);          
         }
-        public async Task<string> SetRelative(string axis)
-        {
-            //_conn.Write($"{Axis(axis)} s r0xc8 256");
+
+        public void SetRelative(string axis)
+        {   
+            //create command
             string ascii = $"{Axis(axis)} s r0xc8 256";
             Command command = new Command(ascii);
             _conn.AddCommand(command);
-            string res = await command.TSC.Task;
-            return res;
         }
 
         // get fsol status
@@ -620,35 +407,15 @@ namespace QMProjectTektronix
             string ascii = $"{axis} g r0xab";
             Command command = new Command(ascii);
             _conn.AddCommand(command);
-            string res = await command.TSC.Task;
-            int n;              
-            int.TryParse(res.Split()[1], out n);
+            string res = await command.TSC.Task;                 
+            int.TryParse(res.Split()[1], out int n);
             Console.WriteLine("Fsol: " + n);
             return n;
-
-            //string res = _conn.Write($"{axis} g r0xab");
-            /*
-            int n;
-            try
-            {
-                n = Int32.Parse(res.Split()[1]);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                n = -1;
-            }
-            catch (FormatException)
-            {
-                n = -1;
-            }
-            return n;           
-            */
         }
 
         //Set Fsol
         public async Task<int> Fsol(int number, string status)
         {
-
             int axis = 0;
             int bit = 0;
 
@@ -682,231 +449,103 @@ namespace QMProjectTektronix
             Command command = new Command(ascii);
             _conn.AddCommand(command);
             string res = await command.TSC.Task;
-            //string res = _conn.Write($"{axis} s r0xab {bit}");
-            int nres;
-            try
-            {
-                nres = Int32.Parse(res.Split()[1]);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                nres = -1;
-            }
-            catch (FormatException)
-            {
-                nres = -1;
-            }
+            
+           
+            int.TryParse(res, out int nres);
+
             return nres;
         }
 
-        public async Task<string> Distance(string axis, int? pos)
+        public void Distance(string axis, int? pos)
         {
-            string res;
-            int nres;
             string ascii;
             Command command;
             if (pos is null)
             {
-                //get
-                //res = _conn.Write($"{Axis(axis)} g r0xca");
                 ascii = $"{Axis(axis)} g r0xca";
-                
+                command = new Command(ascii, true, true);
             }
             else
             {
-                //set
-                //res =_conn.Write($"{Axis(axis)} s r0xca {pos}");
-                //Console.WriteLine("res:" + res);
                 ascii = $"{Axis(axis)} s r0xca {pos}";
+                command = new Command(ascii, true, false);
             }
-            command = new Command(ascii);
-            _conn.AddCommand(command);
-            res = await command.TSC.Task;
-            Int32.TryParse(res.Split()[1], out nres);
-            if (pos == null)
-            {
-                Console.WriteLine("distance: " + nres);
-            }
-            return res;
-            /*
-            try
-            {
-                nres = Int32.Parse(res.Split()[1]);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("Distance: IndexOutOfRangeException");
-                nres = -1;
-            }
-            return nres;
-            */
+            
+            _conn.AddCommand(command);                
         }
+
         public async Task<int> Position(string axis)
         {
             string ascii;
-            string res;
-            int nres;
             Command command;
-
+            //create command
             ascii = $"{Axis(axis)} g r0x32";
-            command = new Command(ascii);
-            _conn.AddCommand(command);
-            res = await command.TSC.Task;
-            /*
-            //write
-            string message = $"{Axis(axis)} g r0x32";
-            message += "\n";
-            byte[] bytes = Encoding.ASCII.GetBytes(message);
-            _conn.Write(bytes, false);
-            //read
-            //byte[] resBytes = _conn.ReadBytes();
-            //string res = Encoding.ASCII.GetString(resBytes);
-            string res = _conn.ReadBytes2();
-            */
-             
-            Int32.TryParse(res.Split()[1], out nres);
-            Console.WriteLine("position: " + nres);
-            return nres;    
+            command = new Command(ascii, true, false);
+            _conn.AddCommand(command);          
+            //get result
+            string res = await command.TSC.Task;
+            //convert to int
+            Int32.TryParse(res.Split()[1], out int n);        
+            
+            return n;
         }
-        public async Task<string> Velocity(string axis, int? value)
-        {
-            //Console.WriteLine("in stagecontorls velocity");
-            string res;
-            //int nres;
+
+        public void Velocity(string axis, int? value)
+        {           
             string ascii;
             Command command;
             if (value is null)
             {
                 //get
-                //_conn.Write(ascii,false);
                 ascii = $"{Axis(axis)} g r0xcb";
-                
-                
-                
-                //res = await _conn.ReadBytes2Async();
-                //Console.WriteLine(res);
+                command = new Command(ascii, true, true);
             }
             else
             {
                 //set
-                //res = _conn.Write($"{Axis(axis)} s r0xcb {pos}");
                 ascii = $"{Axis(axis)} s r0xcb {value}";
-                
-            }
-            command = new Command(ascii);
+                command = new Command(ascii, true, false);
+
+            }            
             _conn.AddCommand(command);
-            res = await command.TSC.Task;
-
-            //Int32.TryParse(res.Split()[1], out nres);
-            //if (value == null)
-            //{
-            //    Console.WriteLine("velocity: " + nres);
-            //}
-            return res;
-            /*
-            try
-            {
-                
-                nres = Int32.Parse(res.Split()[1]);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                nres = -1;
-            }
-            catch (FormatException)
-            {
-                nres = -1;
-            }
-            Console.WriteLine("velocity: " + nres);
-            return nres;
-            */
-
         }
-        public async Task<int> Acceleration(string axis, int? pos)
+
+        public void Acceleration(string axis, int? pos)
         {
-            string res;
-            int nres;
             string ascii;
             Command command;
-            
             if (pos is null)
             {
                 //get
-                //res = _conn.Write($"{Axis(axis)} g r0xcc");
                 ascii = $"{Axis(axis)} g r0xcc";
-                
+                command = new Command(ascii, true, true);
             }
             else
             {
                 //set
-                //res = _conn.Write($"{Axis(axis)} s r0xcc {pos}");
                 ascii = $"{Axis(axis)} s r0xcc {pos}";
-                
+                command = new Command(ascii, true, false);
             }
-            command = new Command(ascii);
+            
             _conn.AddCommand(command);
-            res = await command.TSC.Task;
-            Int32.TryParse(res.Split()[1], out nres);
-            if (pos == null)
-            {
-                Console.WriteLine("acceleration: " + nres);
-            }
-
-            return nres;
-            /*
-            int nres;
-            try
-            {
-                nres = Int32.Parse(res.Split()[1]);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                nres = -1;
-            }
-            return nres;
-            */
         }
-        public async Task<int> Deceleration(string axis, int? pos)
+        public void Deceleration(string axis, int? pos)
         {
-            string res;
-            int nres;
             string ascii;
             Command command;
             if (pos is null)
             {
                 //get
-                //res = _conn.Write($"{Axis(axis)} g r0xcd");
                 ascii = $"{Axis(axis)} g r0xcd";
-                
+                command = new Command(ascii, true, true);
             }
             else
             {
                 //set
-                //res =_conn.Write($"{Axis(axis)} s r0xcd {pos}");
                 ascii = $"{Axis(axis)} s r0xcd {pos}";
-                
-            }
-            command = new Command(ascii);
+                command = new Command(ascii, true, false);
+            }          
             _conn.AddCommand(command);
-            res = await command.TSC.Task;
-            Int32.TryParse(res.Split()[1], out nres);
-            if (pos == null)
-            {
-                Console.WriteLine("acceleration: " + nres);
-            }        
-            return nres;
-            /*
-            int nres;
-            try
-            {
-                nres = Int32.Parse(res.Split()[1]);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                nres = -1;
-            }
-            return nres;
-            */
         }
 
         public async Task<bool> WaferSensor()
@@ -928,21 +567,49 @@ namespace QMProjectTektronix
 
         public async Task WaitForWafer()
         {
-            
-            
             for (int i = 0; i < 100; i++)
-            {
-                
+            {           
                 bool status = await WaferSensor();
 
                 if (status)
                 {
+                    Console.WriteLine("wafer detected");
                     return;
                 }
-                await Task.Delay(1000);
-            }
-            
+                await Task.Delay(500);
+            }           
             throw new OperationFailedException("no  wafer detected");
+        }
+
+        public async Task WaitForGrip()
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                bool status = await GripperClosed();
+
+                if (status)
+                {
+                    Console.WriteLine("grip status: closed");
+                    return;
+                }
+                await Task.Delay(500);
+            }
+            throw new OperationFailedException("gripper did not open");
+        }
+        public async Task WaitForUngrip()
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                bool status = await GripperOpen();
+
+                if (status)
+                {
+                    Console.WriteLine("grip status: open");
+                    return;
+                }
+                await Task.Delay(500);
+            }
+            throw new OperationFailedException("gripper did not close");
         }
 
         public async Task<bool> TBreakOn()
@@ -957,9 +624,9 @@ namespace QMProjectTektronix
             int.TryParse(splitRes[1], out int n);
             if ((n & input6_1) == 0)
             {
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
 
         public async Task<bool> GripperOpen()
@@ -973,7 +640,7 @@ namespace QMProjectTektronix
             string[] splitRes = res.Split();                        
             int.TryParse(splitRes[1], out int n);                     
             if ((n & input8_3) == 0)
-            {
+            {             
                 return true;
             }
             return false;

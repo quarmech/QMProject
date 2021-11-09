@@ -274,10 +274,10 @@ namespace QMProjectTektronix
                 {
                     await sc.MoveAbsoluteAsync(axis, Positions.Center[axis]);
                 }
-                catch (OperationFailedException)
+                catch (OperationFailedException ex)
                 {
-                    
-                }               
+                    Console.WriteLine(ex.Message);
+                }
             }            
         }
 
@@ -295,9 +295,9 @@ namespace QMProjectTektronix
                 {
                     await sc.MoveAbsoluteAsync(axis, Positions.PosLimit[axis]);
                 }
-                catch (OperationFailedException)
+                catch (OperationFailedException ex)
                 {
-                    
+                    Console.WriteLine(ex.Message);
                 }
             }
         }
@@ -528,7 +528,7 @@ namespace QMProjectTektronix
                 try
                 {
                     await sc.HomeStage(axis);
-                    Console.WriteLine("moving started");
+                    Console.WriteLine($"homeing {axis} axis");
                 }
                 catch (OperationFailedException ex)
                 {

@@ -238,7 +238,7 @@ namespace QMProjectTektronix
 
         public async Task JoyStickDelayedOn(string axis)
         {
-            await Task.Delay(4000);
+            await Task.Delay(2000);
             await JoyStickFast(axis);
         }
 

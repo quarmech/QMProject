@@ -37,7 +37,7 @@ namespace QMProjectTektronix
 
                 //vacuum off
                 ac.VacuumOff();
-                await ac.WaitVacuumOff();   
+                await ac.WaitVacuumOff();
                 
                 //move chuck up
                 ac.MoveUp();
@@ -98,7 +98,7 @@ namespace QMProjectTektronix
                 await ac.Align();
                 await ac.WaitForAlign();
 
-                Console.WriteLine("wafer aligned");
+                Console.WriteLine("routine done");
             }
             catch (OperationFailedException ex)
             {

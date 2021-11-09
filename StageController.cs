@@ -199,6 +199,10 @@ namespace QMProjectTektronix
      
         private async Task JoyStickLimitCheck(string axis)
         {
+            if(!JoyStickDict[axis])
+            {
+                return;
+            }
             bool limitReached = false;
             int errorCode = await Error(axis);
             int posLimitBit = pow2(9);
@@ -578,23 +582,31 @@ namespace QMProjectTektronix
 
         public async Task WaitForWafer()
         {
-            for (int i = 0; i < 100; i++)
-            {           
+            Console.WriteLine("waiting for wafer");
+
+            CancellationTokenSource source = new CancellationTokenSource(5000);
+
+            while (!source.IsCancellationRequested)
+            {
                 bool status = await WaferSensor();
 
                 if (status)
                 {
                     Console.WriteLine("wafer detected");
                     return;
-                }
-                await Task.Delay(500);
-            }           
+                }              
+            }
+            
             throw new OperationFailedException("no  wafer detected");
         }
 
         public async Task WaitForGrip()
         {
-            for (int i = 0; i < 100; i++)
+            Console.WriteLine("waiting for grip");
+
+            CancellationTokenSource source = new CancellationTokenSource(5000);
+
+            while (!source.IsCancellationRequested)
             {
                 bool status = await GripperClosed();
 
@@ -603,13 +615,17 @@ namespace QMProjectTektronix
                     Console.WriteLine("grip status: closed");
                     return;
                 }
-                await Task.Delay(500);
             }
+
             throw new OperationFailedException("gripper did not open");
         }
         public async Task WaitForUngrip()
         {
-            for (int i = 0; i < 100; i++)
+            Console.WriteLine("waiting for ungrip");
+
+            CancellationTokenSource source = new CancellationTokenSource(5000);
+
+            while (!source.IsCancellationRequested)
             {
                 bool status = await GripperOpen();
 
@@ -618,8 +634,8 @@ namespace QMProjectTektronix
                     Console.WriteLine("grip status: open");
                     return;
                 }
-                await Task.Delay(500);
             }
+
             throw new OperationFailedException("gripper did not close");
         }
 

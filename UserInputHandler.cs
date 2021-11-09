@@ -203,13 +203,23 @@ namespace QMProjectTektronix
             {
                 RotateWafer(splitInput);
             }
+            else if (stringComparer.Equals("joystatus", code))
+            {
+                JoystickStatus();
+            }
             else
             {
                 sc.Send(command);
             }
             return res;
         }
-
+        public void JoystickStatus()
+        {
+            Console.WriteLine($" x: {((sc.JoyStickDict["x"])==true ? "on" : "off")}");
+            Console.WriteLine($" y: {((sc.JoyStickDict["y"]) == true ? "on" : "off")}");
+            Console.WriteLine($" z: {((sc.JoyStickDict["z"]) == true ? "on" : "off")}");
+            Console.WriteLine($" t: {((sc.JoyStickDict["t"]) == true ? "on" : "off")}");
+        }
         public async Task TBreak()
         {
             if(await sc.TBreakOn())

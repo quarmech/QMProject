@@ -56,8 +56,12 @@ namespace QMProjectTektronix
 
         public async Task WaitForDown()
         {
-            for (int i = 0; i < 100; i++)
-            {
+            Console.WriteLine("waiting for chuck down");
+
+            CancellationTokenSource source = new CancellationTokenSource(10000);
+
+            while (!source.IsCancellationRequested)
+            {  
                 string ascii = "ZRS";
                 Command command = new Command(ascii);
                 _conn.AddCommand(command);
@@ -71,15 +75,19 @@ namespace QMProjectTektronix
                 {
                     throw new OperationFailedException("could not read z position status");
                 }
-                await Task.Delay(100);
             }
             throw new OperationFailedException("Moving up timedout");
         }
 
         public async Task WaitForUp()
         {
-            for (int i = 0; i < 100; i++)
+            Console.WriteLine("waiting for chuck up");
+
+            CancellationTokenSource source = new CancellationTokenSource(10000);
+
+            while (!source.IsCancellationRequested)
             {
+                
                 string ascii = "ZRS";
                 Command command = new Command(ascii);
                 _conn.AddCommand(command);
@@ -92,8 +100,7 @@ namespace QMProjectTektronix
                 {
                     Console.WriteLine("Chuck reached up postion");
                     return;
-                }
-                await Task.Delay(100);
+                }              
             }
             throw new OperationFailedException("Moving up timedout");
         }
@@ -102,7 +109,11 @@ namespace QMProjectTektronix
 
         public async Task WaitForAlign()
         {
-            for (int i = 0; i < 100; i++)
+            Console.WriteLine("waiting for align");
+
+            CancellationTokenSource source = new CancellationTokenSource(10000);
+
+            while (!source.IsCancellationRequested)
             {
                 //create command
                 string ascii = "ASG";
@@ -124,7 +135,6 @@ namespace QMProjectTektronix
                 {
                     throw new OperationFailedException("align failed");                   
                 }
-                await Task.Delay(500);
             }
             throw new OperationFailedException("align timed out");
         }
@@ -153,32 +163,37 @@ namespace QMProjectTektronix
 
         public async Task WaitVacuumOn()
         {
-            for(int i=0; i<100; i++)
-            {
-                await Task.Delay(500);
+            Console.WriteLine("waiting for vacuum on");
+
+            CancellationTokenSource source = new CancellationTokenSource(10000);
+
+            while (!source.IsCancellationRequested)
+            {                  
                 bool status = await VacuumStatus();
 
                 if (status)
                 {
                     return;
-                }
-                    
+                }                    
             }
             throw new OperationFailedException("failed: vacuum did not turn on");
         }
         public async Task WaitVacuumOff()
         {
-            for (int i = 0; i < 100; i++)
-            {
-                await Task.Delay(500);
+            Console.WriteLine("waiting for vacuum off");
+
+            CancellationTokenSource source = new CancellationTokenSource(5000);
+
+            while (!source.IsCancellationRequested)
+            {             
                 bool status = await VacuumStatus();
 
                 if (!status)
                 {
                     return;
                 }
-
             }
+
             throw new OperationFailedException("failed: vacuum did not turn off");
         }
 

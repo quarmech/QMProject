@@ -19,11 +19,11 @@ Program to control X,Y,Z,T stages and aligner.
 
 ## Commands:
 
-End and Exit: quit
+End and Exit: **quit**
 
-Reset all Amplifiers: reset
+Reset all Amplifiers: **reset**
 
-Home an axis: home <axis>
+Home an axis: **home <axis>**
 
 Move by Absolute: moveabs <axis> <value>
 
@@ -58,4 +58,6 @@ Run routine Align 200mm: alignwafer200
 Run routine Align 150mm: alignwafer150
   
 Run routine go to wafer pick position: pickupwafer
+
+
 

@@ -203,13 +203,23 @@ namespace QMProjectTektronix
             {
                 RotateWafer(splitInput);
             }
+            else if (stringComparer.Equals("joystatus", code))
+            {
+                JoystickStatus();
+            }
             else
             {
                 sc.Send(command);
             }
             return res;
         }
-
+        public void JoystickStatus()
+        {
+            Console.WriteLine($" x: {((sc.JoyStickDict["x"])==true ? "on" : "off")}");
+            Console.WriteLine($" y: {((sc.JoyStickDict["y"]) == true ? "on" : "off")}");
+            Console.WriteLine($" z: {((sc.JoyStickDict["z"]) == true ? "on" : "off")}");
+            Console.WriteLine($" t: {((sc.JoyStickDict["t"]) == true ? "on" : "off")}");
+        }
         public async Task TBreak()
         {
             if(await sc.TBreakOn())
@@ -505,7 +515,7 @@ namespace QMProjectTektronix
             }
         }
         
-        public void Home(string[] input)
+        public async Task Home(string[] input)
         {           
             string axis;
             if (input.Length<2)
@@ -514,8 +524,16 @@ namespace QMProjectTektronix
             }
             else
             {
-                axis = input[1];
-                sc.HomeStage(axis);
+                axis = input[1];             
+                try
+                {
+                    await sc.HomeStage(axis);
+                    Console.WriteLine("moving started");
+                }
+                catch (OperationFailedException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }           
         }      
 

@@ -199,6 +199,10 @@ namespace QMProjectTektronix
      
         private async Task JoyStickLimitCheck(string axis)
         {
+            if(!JoyStickDict[axis])
+            {
+                return;
+            }
             bool limitReached = false;
             int errorCode = await Error(axis);
             int posLimitBit = pow2(9);
@@ -242,7 +246,7 @@ namespace QMProjectTektronix
             await JoyStickFast(axis);
         }
 
-        public async Task<bool> CheckMoveComplete(string axis)
+        public async Task<bool> WaitMoveComplete(string axis)
         {
             int errorCode;
             int currentPos;
@@ -250,14 +254,14 @@ namespace QMProjectTektronix
             int bit27 = 134217728;
             int repeatCount = 0;
             while(true)
-            {           
+            {   
+                //check if stage has stopped
                 errorCode = await Error(axis);
                 if (((errorCode & bit27) != bit27))
                 {
-                    //Moving = false;
-                    Console.WriteLine($"moveing {axis} done");
                     return false;
                 }
+                //check if stage stuck
                 currentPos = await Position(axis);
                 if (currentPos == prevPos)
                 {
@@ -265,12 +269,10 @@ namespace QMProjectTektronix
                 }
                 if (repeatCount>5)
                 {
-                    //Moving = false;
-                    Console.WriteLine($"stuck moveing {axis}");
                     return false;
                 }
                 prevPos = currentPos;
-                await Task.Delay(1000);
+                await Task.Delay(100);
             }
         }
  
@@ -280,18 +282,15 @@ namespace QMProjectTektronix
             Command command;
             if (await IsMoving(axis))
             {
-                //return "axis in motion";
-                //Console.WriteLine("axis in motion");
+                throw new OperationFailedException("axis in motion");
             }
             if (JoyStickDict[axis])
             {
                 JoyStickOff(axis);
             }
             ascii = $"{Axis(axis)} t 2";
-            //_conn.Write($"{Axis(axis)} t 2");
             command = new Command(ascii);
             _conn.AddCommand(command);
-
         }
 
         public async Task<bool> IsMoving(string axis)
@@ -312,7 +311,6 @@ namespace QMProjectTektronix
             Command command;
             if (await IsMoving(axis))
             {
-                //return "axis in motion";               
                 throw new OperationFailedException("axis in motion");             
             }
             if (JoyStickDict[axis])
@@ -357,14 +355,10 @@ namespace QMProjectTektronix
             //check if homed
             bool homed = await IsHomed(axis);
             if(!homed)
-            {
-                //await HomeAsync(axis);
-                //await CheckMoveComplete(axis);
-             
+            {             
                 throw new OperationFailedException($"{axis} axis not homed");
-                //return;
-            }
 
+            }
             SetAbsolute(axis);
             Distance(axis, pos);
             await MoveAsync(axis);
@@ -449,8 +443,7 @@ namespace QMProjectTektronix
             Command command = new Command(ascii);
             _conn.AddCommand(command);
             string res = await command.TSC.Task;
-            
-           
+                      
             int.TryParse(res, out int nres);
 
             return nres;
@@ -567,23 +560,31 @@ namespace QMProjectTektronix
 
         public async Task WaitForWafer()
         {
-            for (int i = 0; i < 100; i++)
-            {           
+            Console.WriteLine("waiting for wafer");
+
+            CancellationTokenSource source = new CancellationTokenSource(5000);
+
+            while (!source.IsCancellationRequested)
+            {
                 bool status = await WaferSensor();
 
                 if (status)
                 {
                     Console.WriteLine("wafer detected");
                     return;
-                }
-                await Task.Delay(500);
-            }           
+                }              
+            }
+            
             throw new OperationFailedException("no  wafer detected");
         }
 
         public async Task WaitForGrip()
         {
-            for (int i = 0; i < 100; i++)
+            Console.WriteLine("waiting for grip");
+
+            CancellationTokenSource source = new CancellationTokenSource(5000);
+
+            while (!source.IsCancellationRequested)
             {
                 bool status = await GripperClosed();
 
@@ -592,13 +593,17 @@ namespace QMProjectTektronix
                     Console.WriteLine("grip status: closed");
                     return;
                 }
-                await Task.Delay(500);
             }
+
             throw new OperationFailedException("gripper did not open");
         }
         public async Task WaitForUngrip()
         {
-            for (int i = 0; i < 100; i++)
+            Console.WriteLine("waiting for ungrip");
+
+            CancellationTokenSource source = new CancellationTokenSource(5000);
+
+            while (!source.IsCancellationRequested)
             {
                 bool status = await GripperOpen();
 
@@ -607,8 +612,8 @@ namespace QMProjectTektronix
                     Console.WriteLine("grip status: open");
                     return;
                 }
-                await Task.Delay(500);
             }
+
             throw new OperationFailedException("gripper did not close");
         }
 

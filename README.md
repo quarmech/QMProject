@@ -23,7 +23,7 @@ End and Exit: **quit**
 
 Reset all Amplifiers: **reset**
 
-###Stage Commands:
+######Stage Commands:
 
 Read Error codes: **error <axis>**
 
@@ -53,9 +53,9 @@ Turn on motor: **on <axis>**
   
 Turn off motor: **off <axis>**
 
-###joystick:
+######joystick:
 
-Activate Joystick Fast mode: **joyfast <axis>**
+Activate Joystick Fast mode: **joyfast \<axis>**
 
 Activate Joystick slow mode: **joyfast <axis>**
 
@@ -67,7 +67,7 @@ deactivate all axis: **joyoffall**
 
 joystick status: **joystatus**
 
-###solenoid valves:
+######solenoid valves:
 
 Turn on Festo solenoid: **fsol <number> on**
 
@@ -81,7 +81,7 @@ toggle tilt break: **tbreak**
 
 get tilt break status: **tbreakstatus**
 
-###routines:
+######routines:
 
 Run routine Align 300mm: **alignwafer300**
   
@@ -91,7 +91,7 @@ Run routine Align 150mm: **alignwafer150**
   
 Run routine go to wafer pick position: **pickupwafer**
 
-###vacuum:
+######vacuum:
 
 turn on vacuum: **vacuumOn**
 
@@ -99,7 +99,7 @@ turn on vacuum: **vacuumOff**
 
 vacuum status: **vacuumstatus**
 
-###aligner commands
+######aligner commands
 
 All aligner commands are in the document: Commands.txt
 To use those commands type "a" in front.
@@ -112,9 +112,9 @@ Lower chuck: **a ZMD**
 
 find notch or flat: **a APF**
 
-###other aligner commands:
+######other aligner commands:
 
-rotate wafer to absolute degree: **rotatewafer <degree>**
+rotate wafer to absolute degree: **rotatewafer \<degree>**
 
 
 

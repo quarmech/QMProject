@@ -105,7 +105,7 @@ vacuum status: **vacuumstatus**
 
 <ins>aligner commands</ins>
 
-All aligner commands are in the document: Commands.txt  To use those commands type "a" in front.
+All aligner commands are in the document: Commands.txt    To use those commands type "a" in front.
 
 raise chuck up: **a ZMU**
 

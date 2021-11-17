@@ -7,10 +7,22 @@ using System.Threading.Tasks;
 namespace QMProjectTektronix
 {
     public class Routines
-    {    
+    {   
+        /// <summary>
+        /// Used to end routine loops. Input "stop" command to set to true.
+        /// </summary>
         static public bool Stop { get; set; } = false;
 
         static Routines(){}
+
+        /// <summary>
+        /// performes cycles of moving to position for receiving wafer and then moving to sensor position for aligning wafer.
+        /// keeps and outputs count of cycles.
+        /// </summary>
+        /// <param name="sc"></param>
+        /// <param name="ac"></param>
+        /// <param name="size">wafer size 150/200/300</param>
+        /// <returns></returns>
         static public async Task PickUpWaferAndAlignCycle(StageController sc, AlignerController ac, int size)
         {
             int count = 0;
@@ -23,7 +35,12 @@ namespace QMProjectTektronix
                 Console.WriteLine("count:"+count);
             }          
         }
-
+        /// <summary>
+        /// Moves aligner to position for receiving wafer. Raises chuck, turns off vacuum, opens gripper.
+        /// </summary>
+        /// <param name="sc"></param>
+        /// <param name="ac"></param>
+        /// <returns></returns>
         static public async Task WaferPickUpPosition(StageController sc, AlignerController ac)
         {
             try
@@ -55,7 +72,15 @@ namespace QMProjectTektronix
                 Console.WriteLine("routine failed:" + ex.Message);
             }
         }
-
+        /// <summary>
+        /// performs alignment of wafer. Waits for wafer sensor to respond. Moves aligner to correct notch/falt sensor position (based on size). 
+        /// Opens gripper. Turns off vacuum. Moves chuck with wafer down. Closes gripper to center wafer. 
+        /// Turns on vacuum and moves chuck with wafer up. Alignes wafer.
+        /// </summary>
+        /// <param name="sc"></param>
+        /// <param name="ac"></param>
+        /// <param name="size">wafer size 150/200/300</param>
+        /// <returns></returns>
         static public async Task AlignWafer(StageController sc, AlignerController ac, int size)
         {
             try
@@ -107,6 +132,12 @@ namespace QMProjectTektronix
             }
         }
         
+        /// <summary>
+        /// Moves y stage from home to max positive position. Used for testing.
+        /// </summary>
+        /// <param name="sc"></param>
+        /// <param name="ac"></param>
+        /// <returns></returns>
         static public async Task Routine1(StageController sc, AlignerController ac)
         {
             while (!Stop)

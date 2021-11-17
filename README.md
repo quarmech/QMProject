@@ -21,19 +21,18 @@ Program to control X,Y,Z,T stages and aligner.
 
 End and Exit: **quit**
 
-Reset all Amplifiers: **reset**
-
 <ins>Stage Commands:</ins>
-
-Read Error codes: **error \<axis>**
-
-stop all motion: **stop**
 
 Home an axis: **home \<axis>**
 
 Move by Absolute: **moveabs \<axis> \<value>**
 
 Move by Relative: **moverel \<axis> \<value>**
+
+move to center position: **center \<axis>**
+
+move to positive limit position: **poslimit \<axis>**
+
 
 Get Position: **pos \<axis>**
 
@@ -45,9 +44,12 @@ Get/Set acceleration: **accel \<axis> \<value>**
 
 Get/Set deceleration: **decel \<axis> \<value>**
 
-move to center position: **center \<axis>**
 
-move to positive limit position: **poslimit \<axis>**
+Reset all Amplifiers: **reset**
+
+Read Error codes: **error \<axis>**
+
+stop all motion: **stop**
 
 Turn on motor: **on \<axis>**
   
@@ -72,6 +74,8 @@ joystick status: **joystatus**
 Turn on Festo solenoid: **fsol \<number> on**
 
 Turn off Festo solenoid: **fsol \<number> off**
+
+Get Festo solenid status: **fsol \<number>**
 
 grip: **grip**
 

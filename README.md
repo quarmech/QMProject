@@ -112,7 +112,7 @@ Lower chuck: **a ZMD**
 
 find notch or flat: **a APF**
 
-###### other aligner commands:
+<ins>other aligner commands:</ins>
 
 rotate wafer to absolute degree: **rotatewafer \<degree>**
 

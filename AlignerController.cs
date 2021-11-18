@@ -30,6 +30,10 @@ namespace QMProjectTektronix
             string res = await command.TSC.Task;          
         }
 
+        /// <summary>
+        /// Lowers chuck
+        /// </summary>
+        /// <returns></returns>
         public async Task<string> MoveDown()
         {
             string ascii = "ZMD";
@@ -54,6 +58,10 @@ namespace QMProjectTektronix
             return false;
         }
 
+        /// <summary>
+        /// Loops until chuck has completed move to down position
+        /// </summary>
+        /// <returns></returns>
         public async Task WaitForDown()
         {
             Console.WriteLine("waiting for chuck down");
@@ -79,6 +87,10 @@ namespace QMProjectTektronix
             throw new OperationFailedException("Moving up timedout");
         }
 
+        /// <summary>
+        /// Loops until chuck has completed move to up position
+        /// </summary>
+        /// <returns></returns>
         public async Task WaitForUp()
         {
             Console.WriteLine("waiting for chuck up");
@@ -104,6 +116,10 @@ namespace QMProjectTektronix
             throw new OperationFailedException("Moving up timedout");
         }
 
+        /// <summary>
+        /// Loops until align ends
+        /// </summary>
+        /// <returns></returns>
         public async Task WaitForAlign()
         {
             Console.WriteLine("waiting for align");
@@ -136,14 +152,21 @@ namespace QMProjectTektronix
             throw new OperationFailedException("align timed out");
         }
 
-        //note: using ZMX instead of ZMU because ZRS (for getting z-axis status) does not work correctly with ZMU.
+        /// <summary>
+        /// Raises chuck up
+        /// </summary>
         public void MoveUp()
         {
+            //note: using ZMX instead of ZMU because ZRS (for getting z-axis status) does not work correctly with ZMU.
             string ascii = "ZMX";
             Command command = new Command(ascii);
             _conn.AddCommand(command);           
         }
 
+        /// <summary>
+        /// Turns vacuum on
+        /// </summary>
+        /// <returns></returns>
         public async Task VacuumOn()
         {
             string ascii = "VAC1";
@@ -151,7 +174,9 @@ namespace QMProjectTektronix
             _conn.AddCommand(command);
             string res = await command.TSC.Task;
         }
-
+        /// <summary>
+        /// Turns off vacuum
+        /// </summary>
         public void VacuumOff()
         {
             string ascii = "VAC0";
@@ -159,6 +184,10 @@ namespace QMProjectTektronix
             _conn.AddCommand(command);          
         }
 
+        /// <summary>
+        /// Loops untill vacuum has been turned on
+        /// </summary>
+        /// <returns></returns>
         public async Task WaitVacuumOn()
         {
             Console.WriteLine("waiting for vacuum on");
@@ -176,6 +205,11 @@ namespace QMProjectTektronix
             }
             throw new OperationFailedException("failed: vacuum did not turn on");
         }
+
+        /// <summary>
+        /// Loops until vacuum has been shut off
+        /// </summary>
+        /// <returns></returns>
         public async Task WaitVacuumOff()
         {
             Console.WriteLine("waiting for vacuum off");
@@ -195,6 +229,10 @@ namespace QMProjectTektronix
             throw new OperationFailedException("failed: vacuum did not turn off");
         }
 
+        /// <summary>
+        /// Raises chuck up while keeping vacuum on
+        /// </summary>
+        /// <returns></returns>
         public async Task ZVacuumUp()
         {
             string ascii = "ZVMX";
@@ -203,6 +241,10 @@ namespace QMProjectTektronix
             string res = await command.TSC.Task;
         }
 
+        /// <summary>
+        /// Find notch or flat of wafer
+        /// </summary>
+        /// <returns></returns>
         public async Task Align()
         {
             await Escape();

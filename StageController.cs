@@ -246,6 +246,11 @@ namespace QMProjectTektronix
             await JoyStickFast(axis);
         }
 
+        /// <summary>
+        /// Loop which ends when axis has stopped motion. Also Ends if axis is still moving but stuck in same position.
+        /// </summary>
+        /// <param name="axis"></param>
+        /// <returns></returns>
         public async Task<bool> WaitMoveComplete(string axis)
         {
             int errorCode;
@@ -350,6 +355,12 @@ namespace QMProjectTektronix
             await MoveAsync(axis);     
         }
 
+        /// <summary>
+        /// Move to absolute position, axis must be homed.
+        /// </summary>
+        /// <param name="axis">axis</param>
+        /// <param name="pos">position</param>
+        /// <returns></returns>
         public async Task MoveAbsoluteAsync(string axis, int pos)
         {
             //check if homed
@@ -380,7 +391,11 @@ namespace QMProjectTektronix
             _conn.AddCommand(command);
         }
 
-        // get fsol status
+        /// <summary>
+        /// Get festo air solenoid status 
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns></returns>
         public async Task<int> Fsol(int number)
         {
             int axis = 0;         
@@ -407,7 +422,12 @@ namespace QMProjectTektronix
             return n;
         }
 
-        //Set Fsol
+        /// <summary>
+        /// Turns on or off Festo air solenoids. 1-ungrip, 2-grip, 3-not used, 4-not used, 5-tbreak
+        /// </summary>
+        /// <param name="number"></param>
+        /// <param name="status"></param>
+        /// <returns></returns>
         public async Task<int> Fsol(int number, string status)
         {
             int axis = 0;
@@ -558,6 +578,10 @@ namespace QMProjectTektronix
             return false;
         }
 
+        /// <summary>
+        /// Loops until wafer sensor has detected wafer.
+        /// </summary>
+        /// <returns></returns>
         public async Task WaitForWafer()
         {
             Console.WriteLine("waiting for wafer");
@@ -578,6 +602,10 @@ namespace QMProjectTektronix
             throw new OperationFailedException("no  wafer detected");
         }
 
+        /// <summary>
+        ///  Loops until grippers have closed
+        /// </summary>
+        /// <returns></returns>
         public async Task WaitForGrip()
         {
             Console.WriteLine("waiting for grip");
@@ -597,6 +625,11 @@ namespace QMProjectTektronix
 
             throw new OperationFailedException("gripper did not open");
         }
+
+        /// <summary>
+        /// Loops until grippers have opened
+        /// </summary>
+        /// <returns></returns>
         public async Task WaitForUngrip()
         {
             Console.WriteLine("waiting for ungrip");

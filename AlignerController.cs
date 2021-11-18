@@ -136,6 +136,7 @@ namespace QMProjectTektronix
             throw new OperationFailedException("align timed out");
         }
 
+        //note: using ZMX instead of ZMU because ZRS (for getting z-axis status) does not work correctly with ZMU.
         public void MoveUp()
         {
             string ascii = "ZMX";

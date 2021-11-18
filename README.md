@@ -77,9 +77,9 @@ Turn off Festo solenoid: **fsol \<number> off**
 
 Get Festo solenid status: **fsol \<number>**
 
-grip: **grip**
+close gripper: **grip**
 
-ungrip: **ungrip**
+open gripper: **ungrip**
 
 toggle tilt break: **tbreak**
 
@@ -120,7 +120,25 @@ find notch or flat: **a APF**
 rotate wafer to absolute degree: **rotatewafer \<degree>**
 
 
+## Notes:
 
+When Joystick is turned on, JoyStickLimitCheck() is run. It checks if limit is reached and turns off joystick, after 2 seconds joystick is turned on again.
 
+After device has been unpluged it will need to home again.
 
+BUG: JoyStickLimitCheck() on Tilt might miss. It happens when joystick speed is too high, and limit checks on other axis are running simultaneously.
+
+There is a possibility for microscope to hit wafer if there is too much tilt when wafer is in range. It should not be a concern since tilt will only be used for probe cards and operator will watch.
+
+Aligner has a longer readtimeout because responses are sent only after a command is completed. It is possible to change this in aligner configs. See manual
+
+Copley ASCII Programmers guide:
+- Position Mode: page 27
+- Error bits are on page 45
+- Getting inputs and outputs: page 58
+
+Sequences in IMAC are set to control joystick
+    1. high speed
+    2. low speed
+    3. off
 

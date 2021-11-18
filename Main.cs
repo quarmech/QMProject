@@ -29,7 +29,7 @@ namespace QMProjectTektronix
             //main program loop
             Console.Write($"Command:");
             while (!End)
-            {               
+            {
                 string input = Console.ReadLine();
 
                 UserInputHandler.UserCommand(input);              

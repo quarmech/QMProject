@@ -15,9 +15,11 @@ Connection - Serial port connection, read/writes commands, Handles Command Queue
 
 ## Description:
 
-Program to control X,Y,Z,T stages and aligner. 
+Console program to control X,Y,Z,T stages and aligner. 
 
 ## Commands:
+
+All ASCII commands found is Copleys ASCII guide can be used.
 
 End and Exit: **quit**
 
@@ -43,7 +45,6 @@ Get/Set move distance: **dis \<axis> \<value>**
 Get/Set acceleration: **accel \<axis> \<value>**
 
 Get/Set deceleration: **decel \<axis> \<value>**
-
 
 Reset all Amplifiers: **reset**
 
@@ -138,7 +139,12 @@ Copley ASCII Programmers guide:
 - Getting inputs and outputs: page 58
 
 Sequences in IMAC are set to control joystick
-    1. high speed
-    2. low speed
-    3. off
+- 1. high speed
+- 2. low speed
+- 3. off
 
+WARNING: if you turn on joystick for axis whos wires are not connected to amplifier, the motor will just move in the negative position ignoring limits!
+
+Homeing methods are set in CME software
+
+Input should end in **\n**. Responses end in **\r**
